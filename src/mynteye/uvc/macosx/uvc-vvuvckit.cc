@@ -36,11 +36,11 @@ namespace uvc {
 
 struct context {
   context() {
-    VLOG(2) << __func__;
+    LOG(WARNING) << __func__;
   }
 
   ~context() {
-    VLOG(2) << __func__;
+    LOG(WARNING) << __func__;
   }
 };
 
@@ -153,7 +153,7 @@ struct device : public AVfoundationCamera{
   device(std::shared_ptr<context> parent, const CameraConfig &config)
       : AVfoundationCamera(& const_cast<CameraConfig&>(config)),
       parent(parent), _config(config) {
-    VLOG(2) << __func__;
+    LOG(WARNING) << __func__;
     if (strncmp(config.name, MYNT_DEV_NAME, strlen(MYNT_DEV_NAME)) == 0) {
       _vendor_id = MYNTEYE_VID;  // 0x04B4
       _product_id = MYNTEYE_PID;  // 0x00F9
@@ -165,7 +165,7 @@ struct device : public AVfoundationCamera{
   }
 
   ~device() {
-    VLOG(2) << __func__;
+    LOG(WARNING) << __func__;
     std::lock_guard<std::mutex> lock(_devices_mutex);
     for (unsigned int i = 0 ; i < s_devices.size() ; i++) {
       if (this == s_devices[i]) {

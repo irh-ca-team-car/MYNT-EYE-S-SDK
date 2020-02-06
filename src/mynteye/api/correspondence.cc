@@ -25,7 +25,7 @@ Correspondence::Correspondence(const std::shared_ptr<Device> &device,
     const Stream &stream)
   : device_(device), stream_(stream), ready_image_timestamp_(0),
     keep_accel_then_gyro_(false) {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   // set matched stream to be watched too,
   // aim to make stream and matched stream correspondence
   if (stream_ == Stream::LEFT) {
@@ -44,12 +44,12 @@ Correspondence::Correspondence(const std::shared_ptr<Device> &device,
   auto framerate = device_->GetOptionValue(Option::FRAME_RATE);
   stream_interval_us_ = 1000000.f / framerate;
   stream_interval_us_half_ = 0.5f * stream_interval_us_;
-  VLOG(2) << "framerate: " << framerate
+  LOG(WARNING) << "framerate: " << framerate
       << ", interval_us: " << stream_interval_us_;
 }
 
 Correspondence::~Correspondence() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 bool Correspondence::Watch(const Stream &stream) const {

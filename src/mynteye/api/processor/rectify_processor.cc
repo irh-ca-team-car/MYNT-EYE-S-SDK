@@ -473,7 +473,7 @@ RectifyProcessor::RectifyProcessor(
 }
 
 RectifyProcessor::~RectifyProcessor() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 std::string RectifyProcessor::Name() {

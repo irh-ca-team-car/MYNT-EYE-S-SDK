@@ -110,6 +110,7 @@ void unpack_imu_res_packet(const std::uint8_t *data, ImuResPacket *res) {
 
 StandardChannelsAdapter::StandardChannelsAdapter()
   : ChannelsAdapter(Model::STANDARD) {
+    LOG(WARNING) << __func__;
 }
 
 StandardChannelsAdapter::~StandardChannelsAdapter() {

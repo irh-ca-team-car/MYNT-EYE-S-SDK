@@ -38,15 +38,15 @@ bool _mkdir(const std::string &path) {
       ::mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif
   if (status != 0 && errno != EEXIST) {
-    VLOG(2) << "Create directory failed (status " << status
+    LOG(WARNING) << "Create directory failed (status " << status
             << "), path: " << path;
     return false;
   }
   if (errno == EEXIST) {
-    VLOG(2) << "Create directory needless (already exist), path: " << path;
+    LOG(WARNING) << "Create directory needless (already exist), path: " << path;
     return true;
   } else {
-    VLOG(2) << "Create directory success, path: " << path;
+    LOG(WARNING) << "Create directory success, path: " << path;
     return true;
   }
 }

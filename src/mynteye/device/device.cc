@@ -91,12 +91,12 @@ Device::Device(const Model &model,
     channels_(std::make_shared<Channels>(device_, channels_adapter)),
     motions_(std::make_shared<Motions>(channels_)),
     is_default_intrinsics_(false) {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   ReadAllInfos();
 }
 
 Device::~Device() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 std::shared_ptr<Device> Device::Create(
@@ -105,16 +105,19 @@ std::shared_ptr<Device> Device::Create(
     return std::make_shared<StandardDevice>(device);
   } else if (strings::starts_with(name, "MYNT-EYE-")) {
     std::string model_s = name.substr(9, 5);
-    VLOG(2) << "MYNE EYE Model: " << model_s;
+    LOG(WARNING) << "MYNE EYE Model: " << model_s;
     DeviceModel model(model_s);
     if (model.type == 'S') {
       if (model.generation == '1') {
+        LOG(WARNING)<<1;
         return std::make_shared<StandardDevice>(device);
       } else if (model.generation == '2') {
         if (model.baseline_code == '1') {
           if (model.custom_code == '0') {
+            LOG(WARNING)<<"2.1.0";
             return std::make_shared<Standard2Device>(Model::STANDARD2, device);
           } else if (model.custom_code == 'A') {
+            LOG(WARNING)<<"2.1.A";
             return std::make_shared<Standard2Device>(
                 Model::STANDARD210A, device);
           } else {
@@ -140,21 +143,25 @@ std::shared_ptr<Device> Device::Create(
 }
 
 bool Device::Supports(const Stream &stream) const {
+  LOG(WARNING)<<stream;
   auto &&supports = stream_supports_map.at(model_);
   return supports.find(stream) != supports.end();
 }
 
 bool Device::Supports(const Capabilities &capability) const {
+  LOG(WARNING)<<capability;
   auto &&supports = capabilities_supports_map.at(model_);
   return supports.find(capability) != supports.end();
 }
 
 bool Device::Supports(const Option &option) const {
+  LOG(WARNING)<<option;
   auto &&supports = option_supports_map.at(model_);
   return supports.find(option) != supports.end();
 }
 
 bool Device::Supports(const AddOns &addon) const {
+  LOG(WARNING)<<addon;
   CHECK_NOTNULL(device_info_);
   auto &&hw_flag = device_info_->hardware_version.flag();
   switch (addon) {
@@ -170,6 +177,7 @@ bool Device::Supports(const AddOns &addon) const {
 
 const std::vector<StreamRequest> &Device::GetStreamRequests(
     const Capabilities &capability) const {
+      LOG(WARNING)<<"";
   if (!Supports(capability)) {
     LOG(FATAL) << "Unsupported capability: " << capability;
   }
@@ -311,7 +319,7 @@ MotionIntrinsics Device::GetMotionIntrinsics(bool *ok) const {
     return *motion_intrinsics_;
   } else {
     *ok = false;
-    VLOG(2) << "Motion intrinsics not found";
+    LOG(WARNING) << "Motion intrinsics not found";
     return {};
   }
 }
@@ -322,7 +330,7 @@ Extrinsics Device::GetMotionExtrinsics(const Stream &from, bool *ok) const {
     return motion_from_extrinsics_.at(from);
   } catch (const std::out_of_range &e) {
     *ok = false;
-    VLOG(2) << "Motion extrinsics from " << from << " not found";
+    LOG(WARNING) << "Motion extrinsics from " << from << " not found";
     return {};
   }
 }
@@ -528,19 +536,21 @@ void Device::StartVideoStreaming() {
   for (auto &&capability : stream_capabilities) {
   }
   */
+  LOG(WARNING) << "GetKeyStreamCapability";
   auto &&stream_cap = GetKeyStreamCapability();
+  LOG(WARNING) << "Supports";
   if (Supports(stream_cap)) {
     // do stream request selection if more than one request of each stream
     auto &&stream_request = GetStreamRequest(stream_cap);
     streams_->ConfigStream(stream_cap, stream_request);
 
     if (strstr(this->device_info_->name.c_str(), "S2") == nullptr) {
+       LOG(WARNING) << "S2";
       uvc::set_device_mode(
           *device_, stream_request.width, stream_request.height,
           static_cast<int>(stream_request.format), stream_request.fps,
-          [this, stream_cap](
-              const void *data, std::function<void()> continuation) {
-            // drop the first stereo stream data
+          [this, stream_cap](const void *data, std::function<void()> continuation) {
+                           // drop the first stereo stream data
             static std::uint8_t drop_count = 1;
             if (drop_count > 0) {
               --drop_count;
@@ -557,11 +567,12 @@ void Device::StartVideoStreaming() {
             }
             continuation();
             OnStereoStreamUpdate();
-            // VLOG(2) << "Stereo video callback cost "
+            // LOG(WARNING) << "Stereo video callback cost "
             //     << times::count<times::milliseconds>(times::now() - time_beg)
             //     << " ms";
           });
     } else {
+      LOG(WARNING) << "else";
       uvc::set_device_mode(
           *device_, stream_request.width, stream_request.height,
           static_cast<int>(stream_request.format), stream_request.fps,
@@ -584,7 +595,7 @@ void Device::StartVideoStreaming() {
             }
             continuation();
             OnStereoStreamUpdate();
-            // VLOG(2) << "Stereo video callback cost "
+            // LOG(WARNING) << "Stereo video callback cost "
             //     << times::count<times::milliseconds>(times::now() - time_beg)
             //     << " ms";
           });
@@ -650,7 +661,7 @@ void Device::ReadAllInfos() {
         << "Read device infos failed. Please upgrade your firmware to the "
            "latest version.";
   }
-  VLOG(2) << "Device info: {name: " << device_info_->name
+  LOG(WARNING) << "Device info: {name: " << device_info_->name
           << ", serial_number: " << device_info_->serial_number
           << ", firmware_version: "
           << device_info_->firmware_version.to_string()
@@ -690,9 +701,9 @@ void Device::ReadAllInfos() {
       SetIntrinsics(Stream::LEFT, img_params.in_left);
       SetIntrinsics(Stream::RIGHT, img_params.in_right);
       SetExtrinsics(Stream::RIGHT, Stream::LEFT, img_params.ex_right_to_left);
-      VLOG(2) << "Intrinsics left: {" << *GetIntrinsics(Stream::LEFT) << "}";
-      VLOG(2) << "Intrinsics right: {" << *GetIntrinsics(Stream::RIGHT) << "}";
-      VLOG(2) << "Extrinsics left to right: {"
+      LOG(WARNING) << "Intrinsics left: {" << *GetIntrinsics(Stream::LEFT) << "}";
+      LOG(WARNING) << "Intrinsics right: {" << *GetIntrinsics(Stream::RIGHT) << "}";
+      LOG(WARNING) << "Extrinsics left to right: {"
               << GetExtrinsics(Stream::RIGHT, Stream::LEFT) << "}";
       break;
     }
@@ -702,12 +713,12 @@ void Device::ReadAllInfos() {
     imu_params_ = imu_params;
     SetMotionIntrinsics({imu_params.in_accel, imu_params.in_gyro});
     SetMotionExtrinsics(Stream::LEFT, imu_params.ex_left_to_imu);
-    VLOG(2) << "Motion intrinsics: {" << GetMotionIntrinsics() << "}";
-    VLOG(2) << "Motion extrinsics left to imu: {"
+    LOG(WARNING) << "Motion intrinsics: {" << GetMotionIntrinsics() << "}";
+    LOG(WARNING) << "Motion extrinsics left to imu: {"
             << GetMotionExtrinsics(Stream::LEFT) << "}";
   } else {
     imu_params_.ok = false;
-    VLOG(2) << "Motion intrinsics & extrinsics not exist";
+    LOG(WARNING) << "Motion intrinsics & extrinsics not exist";
   }
 }
 
@@ -743,9 +754,9 @@ void Device::UpdateStreamIntrinsics(
       SetIntrinsics(Stream::LEFT, img_params.in_left);
       SetIntrinsics(Stream::RIGHT, img_params.in_right);
       SetExtrinsics(Stream::RIGHT, Stream::LEFT, img_params.ex_right_to_left);
-      VLOG(2) << "Intrinsics left: {" << *GetIntrinsics(Stream::LEFT) << "}";
-      VLOG(2) << "Intrinsics right: {" << *GetIntrinsics(Stream::RIGHT) << "}";
-      VLOG(2) << "Extrinsics left to right: {"
+      LOG(WARNING) << "Intrinsics left: {" << *GetIntrinsics(Stream::LEFT) << "}";
+      LOG(WARNING) << "Intrinsics right: {" << *GetIntrinsics(Stream::RIGHT) << "}";
+      LOG(WARNING) << "Extrinsics left to right: {"
               << GetExtrinsics(Stream::RIGHT, Stream::LEFT) << "}";
       break;
     }

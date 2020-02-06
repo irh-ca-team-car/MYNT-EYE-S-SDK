@@ -102,11 +102,11 @@ struct buffer {
 
 struct context {
   context() {
-    VLOG(2) << __func__;
+    LOG(WARNING) << __func__;
   }
 
   ~context() {
-    VLOG(2) << __func__;
+    LOG(WARNING) << __func__;
   }
 };
 
@@ -130,7 +130,7 @@ struct device {
 
   device(std::shared_ptr<context> parent, const std::string &name)
       : parent(parent), dev_name("/dev/" + name) {
-    VLOG(2) << __func__ << ": " << dev_name;
+    LOG(WARNING) << __func__ << ": " << dev_name;
 
     struct stat st;
     if (stat(dev_name.c_str(), &st) < 0) {  // file status
@@ -202,7 +202,7 @@ struct device {
   }
 
   ~device() {
-    VLOG(2) << __func__;
+    LOG(WARNING) << __func__;
     stop_streaming();
     no_data_count = 0;
     if (fd != -1 && close(fd) < 0) {
@@ -478,7 +478,7 @@ std::vector<std::shared_ptr<device>> query_devices(
       auto one_device = std::make_shared<device>(context, name);
       devices.push_back(one_device);
     } catch (const std::exception &e) {
-      VLOG(2) << "Not a USB video device: " << e.what();
+      LOG(WARNING) << "Not a USB video device: " << e.what();
     }
   }
   closedir(dir);

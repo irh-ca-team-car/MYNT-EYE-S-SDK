@@ -30,7 +30,7 @@ RootProcessor::RootProcessor(std::shared_ptr<Device> device,
     : Processor(std::move(proc_period)),
     device_(device) {}
 RootProcessor::~RootProcessor() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 std::string RootProcessor::Name() {
@@ -41,7 +41,7 @@ s1s2Processor::s1s2Processor(std::shared_ptr<Device> device,
     std::int32_t proc_period)
     : RootProcessor(device, std::move(proc_period)) {}
 s1s2Processor::~s1s2Processor() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 Object *s1s2Processor::OnCreateOutput() {
@@ -79,6 +79,7 @@ void s1s2Processor::ProcessNativeStream(
 }
 
 void s1s2Processor::StartVideoStreaming() {
+  LOG(WARNING)<<"";
   Activate();
   auto streams = getTargetStreams();
   for (unsigned int j =0; j< streams.size(); j++) {

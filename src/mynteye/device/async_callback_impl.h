@@ -29,14 +29,14 @@ AsyncCallback<Data>::AsyncCallback(
       callback_(std::move(callback)),
       count_(0),
       max_data_size_(max_data_size) {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   running_ = true;
   thread_ = std::thread(&AsyncCallback<Data>::Run, this);
 }
 
 template <class Data>
 AsyncCallback<Data>::~AsyncCallback() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   {
     std::lock_guard<std::mutex> _(mtx_);
     running_ = false;
@@ -63,7 +63,7 @@ void AsyncCallback<Data>::PushData(Data data) {
 
 template <class Data>
 void AsyncCallback<Data>::Run() {
-  VLOG(2) << "AsyncCallback(" << name_ << ") thread start";
+  LOG(WARNING) << "AsyncCallback(" << name_ << ") thread start";
   while (true) {
     std::unique_lock<std::mutex> lock(mtx_);
     cv_.wait(lock, [this] { return count_ > 0; });
@@ -78,13 +78,13 @@ void AsyncCallback<Data>::Run() {
     }
 
     if (VLOG_IS_ON(2) && count_ > datas_.size()) {
-      VLOG(2) << "AsyncCallback(" << name_ << ") dropped "
+      LOG(WARNING) << "AsyncCallback(" << name_ << ") dropped "
               << (count_ - datas_.size());
     }
     count_ = 0;
     datas_.clear();
   }
-  VLOG(2) << "AsyncCallback(" << name_ << ") thread end";
+  LOG(WARNING) << "AsyncCallback(" << name_ << ") thread end";
 }
 
 MYNTEYE_END_NAMESPACE

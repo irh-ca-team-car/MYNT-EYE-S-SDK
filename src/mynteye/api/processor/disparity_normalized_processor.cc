@@ -27,11 +27,11 @@ const char DisparityNormalizedProcessor::NAME[] =
 DisparityNormalizedProcessor::DisparityNormalizedProcessor(
     std::int32_t proc_period)
     : Processor(std::move(proc_period)) {
-  VLOG(2) << __func__ << ": proc_period=" << proc_period;
+  LOG(WARNING) << __func__ << ": proc_period=" << proc_period;
 }
 
 DisparityNormalizedProcessor::~DisparityNormalizedProcessor() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 std::string DisparityNormalizedProcessor::Name() {

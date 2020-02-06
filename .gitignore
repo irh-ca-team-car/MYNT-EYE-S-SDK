@@ -47,3 +47,4 @@ _output/
 
 /wrappers/python/third_party/numpy-opencv-converter/
 /wrappers/python/third_party/pyboostcvconverter/
+src/mynteye/uvc/macosx/

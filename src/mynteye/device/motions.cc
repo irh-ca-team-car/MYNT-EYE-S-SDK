@@ -52,11 +52,11 @@ Motions::Motions(std::shared_ptr<Channels> channels)
       proc_mode_(static_cast<const std::int32_t>(ProcessMode::PROC_NONE)),
       motion_intrinsics_(nullptr) {
   CHECK_NOTNULL(channels_);
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 Motions::~Motions() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 void Motions::SetMotionCallback(motion_callback_t callback) {

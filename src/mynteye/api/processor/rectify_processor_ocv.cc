@@ -31,7 +31,7 @@ RectifyProcessorOCV::RectifyProcessorOCV(
       std::int32_t proc_period)
     : Processor(std::move(proc_period)),
       calib_model(CalibrationModel::UNKNOW) {
-  VLOG(2) << __func__ << ": proc_period=" << proc_period;
+  LOG(WARNING) << __func__ << ": proc_period=" << proc_period;
   calib_infos = std::make_shared<struct CameraROSMsgInfoPair>();
   InitParams(
     *std::dynamic_pointer_cast<IntrinsicsPinhole>(intr_left),
@@ -40,7 +40,7 @@ RectifyProcessorOCV::RectifyProcessorOCV(
 }
 
 RectifyProcessorOCV::~RectifyProcessorOCV() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 std::string RectifyProcessorOCV::Name() {
@@ -133,13 +133,13 @@ void RectifyProcessorOCV::InitParams(
   info_pair.R[7] = ex_right_to_left.rotation[2][1];
   info_pair.R[8] = ex_right_to_left.rotation[2][2];
 
-  VLOG(2) << "InitParams size: " << size;
-  VLOG(2) << "M1: " << M1;
-  VLOG(2) << "M2: " << M2;
-  VLOG(2) << "D1: " << D1;
-  VLOG(2) << "D2: " << D2;
-  VLOG(2) << "R: " << R;
-  VLOG(2) << "T: " << T;
+  LOG(WARNING) << "InitParams size: " << size;
+  LOG(WARNING) << "M1: " << M1;
+  LOG(WARNING) << "M2: " << M2;
+  LOG(WARNING) << "D1: " << D1;
+  LOG(WARNING) << "D2: " << D2;
+  LOG(WARNING) << "R: " << R;
+  LOG(WARNING) << "T: " << T;
 
   cv::Rect left_roi, right_roi;
   cv::stereoRectify(

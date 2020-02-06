@@ -55,11 +55,11 @@ struct glog_init {
 
     google::InitGoogleLogging(argv[0]);
 
-    VLOG(2) << __func__;
+    LOG(WARNING) << __func__;
   }
 
   ~glog_init() {
-    VLOG(2) << __func__;
+    LOG(WARNING) << __func__;
     google::ShutdownGoogleLogging();
   }
 };

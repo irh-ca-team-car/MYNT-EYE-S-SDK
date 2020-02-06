@@ -34,14 +34,14 @@ MYNTEYE_BEGIN_NAMESPACE
 namespace tools {
 
 Dataset::Dataset(std::string outdir) : outdir_(std::move(outdir)) {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   if (!files::mkdir(outdir_)) {
     LOG(FATAL) << "Create directory failed: " << outdir_;
   }
 }
 
 Dataset::~Dataset() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   for (auto &&it = stream_writers_.begin(); it != stream_writers_.end(); it++) {
     if (it->second) {
       it->second->ofs.flush();

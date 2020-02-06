@@ -22,7 +22,7 @@ namespace mynteye_jni {
 
 /*
 std::vector<::mynteye_jni::DeviceUsbInfo> Device::Query() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   std::vector<DeviceUsbInfo> infos;
 
   Context context;
@@ -38,7 +38,7 @@ std::vector<::mynteye_jni::DeviceUsbInfo> Device::Query() {
 }
 
 std::shared_ptr<Device> Device::Create(const ::mynteye_jni::DeviceUsbInfo & info) {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   Context context;
   int32_t i = 0;
   for (auto&& d : context.devices()) {
@@ -52,23 +52,23 @@ std::shared_ptr<Device> Device::Create(const ::mynteye_jni::DeviceUsbInfo & info
 */
 
 std::shared_ptr<Device> Device::Create(const ::mynteye_jni::DeviceUsbInfo & info) {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   auto device = uvc::create_device(from_jni(info));
   auto name = uvc::get_name(*device);
   auto vid = uvc::get_vendor_id(*device);
   auto pid = uvc::get_product_id(*device);
-  VLOG(2) << "UVC device detected, name: " << name << ", vid: 0x" << std::hex
+  LOG(WARNING) << "UVC device detected, name: " << name << ", vid: 0x" << std::hex
           << vid << ", pid: 0x" << std::hex << pid;
   return std::make_shared<DeviceImpl>(
       MYNTEYE_NAMESPACE::Device::Create(name, device));
 }
 
 DeviceImpl::DeviceImpl(const device_t & device) : Device(), device_(device) {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 DeviceImpl::~DeviceImpl() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
 }
 
 ::mynteye_jni::Model DeviceImpl::GetModel() {
@@ -92,7 +92,7 @@ bool DeviceImpl::SupportsAddon(::mynteye_jni::Addon addon) {
 }
 
 std::vector<::mynteye_jni::StreamRequest> DeviceImpl::GetStreamRequests() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   std::vector<::mynteye_jni::StreamRequest> requests;
 
   int32_t i = 0;
@@ -107,7 +107,7 @@ std::vector<::mynteye_jni::StreamRequest> DeviceImpl::GetStreamRequests() {
 
 void DeviceImpl::ConfigStreamRequest(
     const ::mynteye_jni::StreamRequest & request) {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   int32_t i = 0;
   for (auto&& req : device_->GetStreamRequests()) {
     if (i == request.index) {

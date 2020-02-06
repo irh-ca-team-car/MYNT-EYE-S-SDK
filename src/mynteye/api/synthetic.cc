@@ -27,11 +27,11 @@
 #include "mynteye/api/processor/disparity_processor.h"
 #include "mynteye/api/processor/root_camera_processor.h"
 #include "mynteye/api/processor/rectify_processor_ocv.h"
-#ifdef WITH_CAM_MODELS
+
 #include "mynteye/api/processor/depth_processor.h"
 #include "mynteye/api/processor/points_processor.h"
 #include "mynteye/api/processor/rectify_processor.h"
-#endif
+
 #include "mynteye/device/device.h"
 #include "mynteye/api/data_tools.h"
 
@@ -65,14 +65,14 @@ Synthetic::Synthetic(API *api, CalibrationModel calib_model)
       calib_model_(calib_model),
       calib_default_tag_(false),
       stream_data_listener_(nullptr) {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   CHECK_NOTNULL(api_);
   InitCalibInfo();
   InitProcessors();
 }
 
 Synthetic::~Synthetic() {
-  VLOG(2) << __func__;
+  LOG(WARNING) << __func__;
   processors_.clear();
   if (processor_) {
     processor_->Deactivate(true);

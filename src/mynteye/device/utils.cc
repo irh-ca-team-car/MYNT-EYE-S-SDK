@@ -33,6 +33,7 @@ namespace device {
 
 std::shared_ptr<Device> select() {
   LOG(INFO) << "Detecting MYNT EYE devices";
+  LOG(INFO) << "SELECTING";
   Context context;
   auto &&devices = context.devices();
 
