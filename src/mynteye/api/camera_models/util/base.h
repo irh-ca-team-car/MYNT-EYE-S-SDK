@@ -15,10 +15,10 @@
 #ifndef SRC_MYNTEYE_API_CAMERA_MODELS_CTAINBASE_H_
 #define SRC_MYNTEYE_API_CAMERA_MODELS_CTAINBASE_H_
 
-#include "util/matrix.h"
-#include "util/matrix_square.h"
-#include "util/matrix_solver.h"
-#include "util/quaternion.h"
+#include "mynteye/api/camera_models/util/matrix.h"
+#include "mynteye/api/camera_models/util/matrix_square.h"
+#include "mynteye/api/camera_models/util/matrix_solver.h"
+#include "mynteye/api/camera_models/util/quaternion.h"
 
 #include "mynteye/mynteye.h"
 

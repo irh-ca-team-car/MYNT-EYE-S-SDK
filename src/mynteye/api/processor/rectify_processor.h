@@ -32,7 +32,8 @@
 MYNTEYE_BEGIN_NAMESPACE
 
 class Device;
-
+typedef cv::Mat CvMat;
+typedef cv::Size CvSize;
 class RectifyProcessor : public Processor {
  public:
   static const char NAME[];
