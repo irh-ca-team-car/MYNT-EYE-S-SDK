@@ -34,8 +34,8 @@ if(OS_WIN)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 else()
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wfatal-errors")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wfatal-errors")
 endif()
 
 include(cmake/DetectCXX11.cmake)
@@ -217,6 +217,9 @@ if(WITH_API)
     src/mynteye/api/correspondence.cc
     src/mynteye/api/version_checker.cc
     src/mynteye/api/data_tools.cc
+    src/mynteye/api/processor/depth_processor.cc
+    src/mynteye/api/processor/points_processor.cc
+    src/mynteye/api/processor/rectify_processor.cc
   )
   if(WITH_CAM_MODELS)
     list(APPEND MYNTEYE_SRCS
