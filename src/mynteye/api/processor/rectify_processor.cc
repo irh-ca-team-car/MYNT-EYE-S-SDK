@@ -18,7 +18,7 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "mynteye/logger.h"
-
+/*
 MYNTEYE_BEGIN_NAMESPACE
 
 cv::Mat RectifyProcessor::rectifyrad(const cv::Mat& R) {
@@ -36,6 +36,8 @@ cv::Mat RectifyProcessor::rectifyrad(const cv::Mat& R) {
   }
   return R.clone();
 }
+typedef cv::Mat CvMat;
+typedef cv::Mat cvMat;
 
 void RectifyProcessor::stereoRectify(models::CameraPtr leftOdo,
     models::CameraPtr rightOdo, const CvMat* K1, const CvMat* K2,
@@ -64,12 +66,14 @@ void RectifyProcessor::stereoRectify(models::CameraPtr leftOdo,
   int i, k;
   double nt, nw;
   if ( matR->rows == 3 && matR->cols == 3)
-      cvRodrigues2(matR, &om);          // get vector rotation
+      cv::Rodrigues(*matR, om);          // get vector rotation
   else
-      cvConvert(matR, &om);  // it's already a rotation vector
-  cvConvertScale(&om, &om, -0.5);  // get average rotation
-  cvRodrigues2(&om, &r_r);  // rotate cameras to same orientation by averaging
-  cvMatMul(&r_r, matT, &t);
+      om=*matR;
+      //cv::Convert(*matR, om);  // it's already a rotation vector
+  cv::convertScaleAbs(om, om, -0.5);  // get average rotation
+  cv::Rodrigues(om, r_r);  // rotate cameras to same orientation by averaging
+  t= r_r* *matT;
+  //cv::MatMul(&r_r, matT, &t);
   int idx = fabs(_t[0]) > fabs(_t[1]) ? 0 : 1;
 
   // if idx == 0
@@ -516,3 +520,4 @@ bool RectifyProcessor::OnProcess(
 }
 
 MYNTEYE_END_NAMESPACE
+*/

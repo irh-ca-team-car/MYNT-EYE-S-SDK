@@ -28,7 +28,7 @@
 
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/highgui/highgui.hpp>
-
+/*
 MYNTEYE_BEGIN_NAMESPACE
 
 class Device;
@@ -119,5 +119,5 @@ class RectifyProcessor : public Processor {
 };
 
 MYNTEYE_END_NAMESPACE
-
+*/
 #endif  // MYNTEYE_API_PROCESSOR_RECTIFY_PROCESSOR_H_
