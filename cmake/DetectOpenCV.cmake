@@ -15,6 +15,8 @@
 include(${CMAKE_CURRENT_LIST_DIR}/IncludeGuard.cmake)
 cmake_include_guard()
 
+set(CMAKE_PREFIX_PATH /opt/opencv341/lib;${CMAKE_PREFIX_PATH})
+
 if(OpenCV_FIND_QUIET)
   find_package(OpenCV 3 QUIET)
 else()
