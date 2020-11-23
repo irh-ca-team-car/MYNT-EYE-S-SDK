@@ -27,11 +27,11 @@ MYNTEYE_BEGIN_NAMESPACE
 namespace tools {
 
 DeviceWriter::DeviceWriter(std::shared_ptr<Device> device) : device_(device) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 DeviceWriter::~DeviceWriter() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 bool DeviceWriter::WriteDeviceInfo(const dev_info_t &info) {

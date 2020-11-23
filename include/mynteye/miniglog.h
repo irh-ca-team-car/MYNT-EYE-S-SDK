@@ -32,8 +32,8 @@
 // Simplified Glog style logging with Android support. Supported macros in
 // decreasing severity level per line:
 //
-//   LOG(WARNING), VLOG(N)
-//   LOG(DEBUG),
+//   VLOG(2), VLOG(N)
+//   VLOG(1),
 //   LOG(INFO), VLOG(0), LG
 //   LOG(WARNING),
 //   LOG(ERROR),
@@ -101,7 +101,7 @@
 #include <vector>
 
 #include "mynteye/mynteye.h"
-#define WITH_CAM_MODELS
+
 #ifdef MYNTEYE_OS_ANDROID
 #  include <android/log.h>
 #endif  // ANDROID
@@ -199,8 +199,8 @@ class MYNTEYE_API MessageLogger {
         ANDROID_LOG_ERROR,    // LOG(ERROR)
         ANDROID_LOG_WARN,     // LOG(WARNING)
         ANDROID_LOG_INFO,     // LOG(INFO), LG, VLOG(0)
-        ANDROID_LOG_DEBUG,    // LOG(DEBUG)
-        ANDROID_LOG_VERBOSE,  // LOG(WARNING) .. VLOG(N)
+        ANDROID_LOG_DEBUG,    // VLOG(1)
+        ANDROID_LOG_VERBOSE,  // VLOG(2) .. VLOG(N)
     };
 
     // Bound the logging level.
@@ -341,7 +341,7 @@ class MYNTEYE_API LoggerVoidify {
 #  define VLOG_IS_ON(x) (x <= MYNTEYE_MAX_LOG_LEVEL)
 #endif
 
-#ifdef MYNTEYE_OS_WIN  // INFO is 2, change LOG(WARNING) to VLOG(4)
+#ifdef MYNTEYE_OS_WIN  // INFO is 2, change VLOG(2) to VLOG(4)
 #undef VLOG
 #undef VLOG_IF
 #undef VLOG_IS_ON

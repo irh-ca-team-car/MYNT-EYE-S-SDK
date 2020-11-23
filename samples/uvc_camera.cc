@@ -29,10 +29,10 @@ struct frame {
   const void *data = nullptr;
   std::function<void()> continuation = nullptr;
   frame() {
-    // LOG(WARNING) << __func__;
+    // VLOG(2) << __func__;
   }
   ~frame() {
-    // LOG(WARNING) << __func__;
+    // VLOG(2) << __func__;
     data = nullptr;
     if (continuation) {
       continuation();

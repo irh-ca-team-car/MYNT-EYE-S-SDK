@@ -21,20 +21,16 @@
 MYNTEYE_BEGIN_NAMESPACE
 
 Context::Context() : context_(uvc::create_context()) {
-  LOG(WARNING) << __func__;
-  LOG(WARNING) << "BEGIN CONTEXT LOAD";
+  VLOG(2) << __func__;
+
   for (auto &&device : uvc::query_devices(context_)) {
-    LOG(WARNING) << "get_name";
     auto name = uvc::get_name(*device);
-    LOG(WARNING) << "get_vendor_id";
     auto vid = uvc::get_vendor_id(*device);
-    LOG(WARNING) << "get_product_id";
     auto pid = uvc::get_product_id(*device);
     // auto video_name = uvc::get_video_name(*device);
-    LOG(WARNING) << "UVC device detected, name: " << name << ", vid: 0x" << std::hex
+    VLOG(2) << "UVC device detected, name: " << name << ", vid: 0x" << std::hex
             << vid << ", pid: 0x" << std::hex << pid;
     if (vid == MYNTEYE_VID) {
-      LOG(WARNING) << "Device::Create";
       auto d = Device::Create(name, device);
       if (d) {
         devices_.push_back(d);
@@ -46,7 +42,7 @@ Context::Context() : context_(uvc::create_context()) {
 }
 
 Context::~Context() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 MYNTEYE_END_NAMESPACE

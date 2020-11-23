@@ -62,11 +62,11 @@ std::ostream &operator<<(
 
 CVPainter::CVPainter(std::int32_t frame_rate)
     : frame_rate_(std::move(frame_rate)) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 CVPainter::~CVPainter() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 cv::Rect CVPainter::DrawSize(const cv::Mat &img, const gravity_t &gravity) {

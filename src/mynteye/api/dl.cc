@@ -44,22 +44,22 @@ std::string GetLastErrorAsString() {
 #endif
 
 DL::DL() : handle(nullptr) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 DL::DL(const char *filename) : handle(nullptr) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
   Open(filename);
 }
 
 DL::~DL() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
   Close();
 }
 
 bool DL::Open(const char *filename) {
   if (handle != nullptr) {
-    LOG(WARNING) << "Already opened, do nothing";
+    VLOG(2) << "Already opened, do nothing";
     // Close();
     return false;
   }
@@ -70,7 +70,7 @@ bool DL::Open(const char *filename) {
   handle = dlopen(filename, RTLD_LAZY);
 #endif
   if (handle == nullptr) {
-    LOG(WARNING) << "Open library failed: " << filename;
+    VLOG(2) << "Open library failed: " << filename;
     return false;
   } else {
     return true;
@@ -83,20 +83,20 @@ bool DL::IsOpened() {
 
 void *DL::Sym(const char *symbol) {
   if (handle == nullptr) {
-    LOG(WARNING) << "Not opened, do nothing";
+    VLOG(2) << "Not opened, do nothing";
     return nullptr;
   }
 #if defined(MYNTEYE_OS_WIN) && !defined(MYNTEYE_OS_MINGW) && !defined(MYNTEYE_OS_CYGWIN)
   void *f = GetProcAddress(handle, symbol);
   if (f == nullptr) {
-    LOG(WARNING) << "Load symbol failed: " << symbol;
+    VLOG(2) << "Load symbol failed: " << symbol;
   }
 #else
   dlerror();  // reset errors
   void *f = dlsym(handle, symbol);
   const char *error = dlerror();
   if (error != nullptr) {
-    LOG(WARNING) << "Load symbol failed: " << symbol;
+    VLOG(2) << "Load symbol failed: " << symbol;
     f = nullptr;
   }
 #endif
@@ -106,7 +106,7 @@ void *DL::Sym(const char *symbol) {
 int DL::Close() {
   int ret = 0;
   if (handle == nullptr) {
-    LOG(WARNING) << "Not opened, do nothing";
+    VLOG(2) << "Not opened, do nothing";
   } else {
 #if defined(MYNTEYE_OS_WIN) && !defined(MYNTEYE_OS_MINGW) && !defined(MYNTEYE_OS_CYGWIN)
     ret = FreeLibrary(handle) ? 0 : 1;

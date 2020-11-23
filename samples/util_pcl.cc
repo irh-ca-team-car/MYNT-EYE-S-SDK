@@ -40,11 +40,11 @@ std::shared_ptr<pcl::visualization::PCLVisualizer> CustomColorVis(
 }
 
 PCViewer::PCViewer() : viewer_(nullptr) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 PCViewer::~PCViewer() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
   if (viewer_) {
     // viewer_->saveCameraParameters("pcl_camera_params.txt");
     viewer_->close();

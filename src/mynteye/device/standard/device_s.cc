@@ -24,11 +24,11 @@ StandardDevice::StandardDevice(std::shared_ptr<uvc::device> device)
   : Device(Model::STANDARD, device,
            std::make_shared<StandardStreamsAdapter>(),
            std::make_shared<StandardChannelsAdapter>()) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 StandardDevice::~StandardDevice() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 Capabilities StandardDevice::GetKeyStreamCapability() const {

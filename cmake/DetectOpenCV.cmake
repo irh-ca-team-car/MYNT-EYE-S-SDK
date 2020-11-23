@@ -16,9 +16,9 @@ include(${CMAKE_CURRENT_LIST_DIR}/IncludeGuard.cmake)
 cmake_include_guard()
 
 if(OpenCV_FIND_QUIET)
-  find_package(OpenCV QUIET)
+  find_package(OpenCV 3 QUIET)
 else()
-  find_package(OpenCV REQUIRED)
+  find_package(OpenCV 3 REQUIRED)
 endif()
 
 if(OpenCV_FOUND)

@@ -37,8 +37,8 @@ int main(int argc, char *argv[]) {
       Stream::LEFT, [&left_count](const device::StreamData &data) {
         CHECK_NOTNULL(data.img);
         ++left_count;
-        LOG(WARNING) << Stream::LEFT << "count: " << left_count;
-        LOG(WARNING) << "  frame_id: " << data.img->frame_id
+        VLOG(2) << Stream::LEFT << "count: " << left_count;
+        VLOG(2) << "  frame_id: " << data.img->frame_id
                 << ", timestamp: " << data.img->timestamp
                 << ", exposure_time: " << data.img->exposure_time;
       });
@@ -47,8 +47,8 @@ int main(int argc, char *argv[]) {
       Stream::RIGHT, [&right_count](const device::StreamData &data) {
         CHECK_NOTNULL(data.img);
         ++right_count;
-        LOG(WARNING) << Stream::RIGHT << "count: " << right_count;
-        LOG(WARNING) << "  frame_id: " << data.img->frame_id
+        VLOG(2) << Stream::RIGHT << "count: " << right_count;
+        VLOG(2) << "  frame_id: " << data.img->frame_id
                 << ", timestamp: " << data.img->timestamp
                 << ", exposure_time: " << data.img->exposure_time;
       });
@@ -58,8 +58,8 @@ int main(int argc, char *argv[]) {
   device->SetMotionCallback([&imu_count](const device::MotionData &data) {
     CHECK_NOTNULL(data.imu);
     ++imu_count;
-    LOG(WARNING) << "Imu count: " << imu_count;
-    LOG(WARNING) << ", timestamp: " << data.imu->timestamp
+    VLOG(2) << "Imu count: " << imu_count;
+    VLOG(2) << ", timestamp: " << data.imu->timestamp
             << ", accel_x: " << data.imu->accel[0]
             << ", accel_y: " << data.imu->accel[1]
             << ", accel_z: " << data.imu->accel[2]

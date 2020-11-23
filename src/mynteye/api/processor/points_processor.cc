@@ -57,11 +57,11 @@ PointsProcessor::PointsProcessor(
     std::int32_t proc_period)
     : Processor(std::move(proc_period)),
     calib_infos_(calib_infos) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 PointsProcessor::~PointsProcessor() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 std::string PointsProcessor::Name() {

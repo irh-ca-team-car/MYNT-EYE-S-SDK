@@ -55,7 +55,7 @@
 
 #include "mynteye/logger.h"
 
-#define VLOG_INFO LOG(WARNING)
+#define VLOG_INFO VLOG(2)
 // #define VLOG_INFO LOG(INFO)
 
 MYNTEYE_BEGIN_NAMESPACE
@@ -521,19 +521,13 @@ bool pu_control_range(
     int32_t *def) {
   VLOG_INFO << __func__ << " " << option;
   const_cast<uvc::device &>(device).get_media_source();
-  VLOG_INFO << __func__ << ". " << option;
   long minVal = 0, maxVal = 0, steppingDelta = 0, defVal = 0, capsFlag = 0;
-  VLOG_INFO << __func__ << ".. " << option;
-  auto t= const_cast<uvc::device &>(device).am_video_proc_amp;
-  VLOG_INFO << __func__ << "... " << t;
-  //check("IAMVideoProcAmp::GetRange",
-  //    t->GetRange(
-  //      get_cid(option), &minVal, &maxVal, &steppingDelta, &defVal, &capsFlag));
-  VLOG_INFO << __func__ << ".... " << option;
+  check("IAMVideoProcAmp::GetRange",
+      const_cast<uvc::device &>(device).am_video_proc_amp->GetRange(
+        get_cid(option), &minVal, &maxVal, &steppingDelta, &defVal, &capsFlag));
   if (min) *min = static_cast<int>(minVal);
   if (max) *max = static_cast<int>(maxVal);
   if (def) *def = static_cast<int>(defVal);
-  
   // VLOG_INFO << __func__ << " " << option <<
   //     ": min=" << *min << ", max=" << *max << ", def=" << *def;
   return true;
@@ -541,9 +535,9 @@ bool pu_control_range(
 
 static void pu_control_get(const device &device, long property, int32_t *value) {
   long data, flags = 0;
-  /*check("IAMVideoProcAmp::Get",
+  check("IAMVideoProcAmp::Get",
       const_cast<uvc::device &>(device).am_video_proc_amp->Get(
-        property, &data, &flags));*/
+        property, &data, &flags));
   *value = data;
 }
 
@@ -665,6 +659,7 @@ static void xu_control_get(const device &device, const xu &xu, uint8_t selector,
       uint16_t size, uint8_t *data) {
   VLOG_INFO << __func__ << " " << static_cast<int>(selector);
   auto &&ks_control = const_cast<uvc::device &>(device).get_ks_control(xu);
+
   KSP_NODE node;
   memset(&node, 0, sizeof(KSP_NODE));
   node.Property.Set = reinterpret_cast<const GUID &>(xu.id);
@@ -686,8 +681,6 @@ static void xu_control_set(const device &device, const xu &xu, uint8_t selector,
       uint16_t size, uint8_t *data) {
   VLOG_INFO << __func__ << " " << static_cast<int>(selector)
       << ": size=" << size << ", data=[" << to_string(size, data) << "]";
-  //if(size==3 && data[0]==0x8a)
-  //  return;
   auto &&ks_control = const_cast<uvc::device &>(device).get_ks_control(xu);
 
   KSP_NODE node;
@@ -700,7 +693,6 @@ static void xu_control_set(const device &device, const xu &xu, uint8_t selector,
   ULONG bytes_received = 0;
   check("IKsControl::KsProperty", ks_control->KsProperty(
       (PKSPROPERTY)&node, sizeof(node), data, size, &bytes_received));
-      
   VLOG_INFO << __func__ << " " << static_cast<int>(selector) << " done";
 }
 

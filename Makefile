@@ -85,7 +85,7 @@ build:
 ifeq ($(HOST_OS),Win)
 	@$(call cmake_build,./_build,..,-DCMAKE_INSTALL_PREFIX=$(MKFILE_DIR)/_install $(CMAKE_BUILD_EXTRA_OPTIONS))
 else
-	@$(call cmake_build,./_build,..,$(CMAKE_BUILD_EXTRA_OPTIONS))
+	@$(call cmake_build,./_build,..,-DCMAKE_INSTALL_PREFIX=/usr $(CMAKE_BUILD_EXTRA_OPTIONS))
 endif
 
 .PHONY: build
@@ -113,6 +113,10 @@ endif
 uninstall:
 	@$(call echo,Make $@)
 ifeq ($(HOST_OS),Linux)
+	$(SUDO) rm -rf /usr/include/mynteye/
+	$(SUDO) rm -rf /usr/lib/libmynteye.so*
+	$(SUDO) rm -rf /usr/lib/cmake/mynteye/
+	$(SUDO) rm -rf /usr/share/mynteye/
 	$(SUDO) rm -rf /usr/local/include/mynteye/
 	$(SUDO) rm -rf /usr/local/lib/libmynteye.so*
 	$(SUDO) rm -rf /usr/local/lib/cmake/mynteye/

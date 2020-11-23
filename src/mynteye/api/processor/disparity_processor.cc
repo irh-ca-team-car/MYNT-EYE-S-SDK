@@ -35,7 +35,7 @@ DisparityProcessor::DisparityProcessor(DisparityComputingMethod type,
   } else {
     cx1_minus_cx2_ = 1.f;
   }
-  LOG(WARNING) << __func__ << ": proc_period=" << proc_period;
+  VLOG(2) << __func__ << ": proc_period=" << proc_period;
   int sgbmWinSize = 3;
   int numberOfDisparities = 128;
 #ifdef WITH_OPENCV2
@@ -110,7 +110,7 @@ void DisparityProcessor::NotifyComputingTypeChanged(
 }
 
 DisparityProcessor::~DisparityProcessor() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 void DisparityProcessor::SetDisparityComputingMethodType(

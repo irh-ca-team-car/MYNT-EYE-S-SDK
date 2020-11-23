@@ -39,11 +39,11 @@ Processor::Processor(std::int32_t proc_period)
       post_callback_(nullptr),
       callback_(nullptr),
       parent_(nullptr) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 Processor::~Processor() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
   Deactivate();
   input_ = nullptr;
   output_ = nullptr;
@@ -167,7 +167,7 @@ std::shared_ptr<Processor> Processor::GetParent() {
 }
 
 void Processor::Run() {
-  LOG(WARNING) << Name() << " thread start";
+  VLOG(2) << Name() << " thread start";
 
   auto sleep = [this](const times::system_clock::time_point &time_beg) {
     if (proc_period_ > 0) {
@@ -177,7 +177,7 @@ void Processor::Run() {
       time_prev = time_beg;
 
       if (time_elapsed_ms < proc_period_) {
-        LOG(WARNING) << Name() << " process cost "
+        VLOG(2) << Name() << " process cost "
                 << times::count<times::milliseconds>(times::now() - time_beg)
                 << " ms, sleep " << (proc_period_ - time_elapsed_ms) << " ms";
         std::this_thread::sleep_for(
@@ -185,7 +185,7 @@ void Processor::Run() {
         return;
       }
     }
-    LOG(WARNING) << Name() << " process cost "
+    VLOG(2) << Name() << " process cost "
             << times::count<times::milliseconds>(times::now() - time_beg)
             << " ms";
   };
@@ -228,7 +228,7 @@ void Processor::Run() {
       LOG(ERROR) << Name() << " process error \"" << msg << "\"";
     }
     if (!ok) {
-      LOG(WARNING) << Name() << " process failed";
+      VLOG(2) << Name() << " process failed";
       continue;
     }
     if (post_callback_) {
@@ -254,7 +254,7 @@ void Processor::Run() {
 
     sleep(time_beg);
   }
-  LOG(WARNING) << Name() << " thread end";
+  VLOG(2) << Name() << " thread end";
 }
 
 Processor::process_type Processor::ProcessOutputConnection() {
@@ -291,7 +291,7 @@ api::StreamData Processor::GetStreamData(const Stream &stream) {
           }
           return obj_data(output);
         }
-        LOG(WARNING) << "Frame not ready now";
+        VLOG(2) << "Frame not ready now";
       }
     } else if (sum == 2) {
       static std::shared_ptr<ObjMat2> output = nullptr;
@@ -328,7 +328,7 @@ api::StreamData Processor::GetStreamData(const Stream &stream) {
           }
         }
       }
-      LOG(WARNING) << "Frame not ready now";
+      VLOG(2) << "Frame not ready now";
     } else {
       LOG(ERROR) << "error: invalid sum!";
     }

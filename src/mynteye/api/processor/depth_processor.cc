@@ -33,11 +33,11 @@ DepthProcessor::DepthProcessor(
     calib_infos_(calib_infos),
     min_disp_(min_disp),
     max_disp_(max_disp) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 DepthProcessor::~DepthProcessor() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 std::string DepthProcessor::Name() {

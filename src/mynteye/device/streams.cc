@@ -31,11 +31,11 @@ Streams::Streams(const std::shared_ptr<StreamsAdapter> &adapter)
       timestamp_compensate_(0),
       is_nearly_before_timestamp_limmit_(0),
       current_datum_(0) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 Streams::~Streams() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 void Streams::ConfigStream(
@@ -44,7 +44,7 @@ void Streams::ConfigStream(
     LOG(ERROR) << "Cannot config stream without stream capability";
     return;
   }
-  LOG(WARNING) << "Config stream request of " << capability << ", " << request;
+  VLOG(2) << "Config stream request of " << capability << ", " << request;
   stream_config_requests_[capability] = request;
 }
 
@@ -102,7 +102,7 @@ bool Streams::PushStream(const Capabilities &capability, const void *data) {
       } else {
         // discard left
         DiscardStreamData(Stream::LEFT);
-        LOG(WARNING) << "Image packet is unaccepted, frame dropped";
+        VLOG(2) << "Image packet is unaccepted, frame dropped";
         pushed = false;
       }
     } break;
@@ -146,7 +146,7 @@ bool Streams::PushStreamS1(const Capabilities &capability, const void *data) {
       } else {
         // discard left
         DiscardStreamData(Stream::LEFT);
-        LOG(WARNING) << "Image packet is unaccepted, frame dropped";
+        VLOG(2) << "Image packet is unaccepted, frame dropped";
         pushed = false;
       }
     } break;
@@ -259,7 +259,7 @@ void Streams::AllocStreamData(const Capabilities &capability,
       data.frame = datas.front().frame;
       data.frame_id = 0;
       datas.erase(datas.begin());
-      LOG(WARNING) << "Stream data of " << stream << " is dropped as out of limits";
+      VLOG(2) << "Stream data of " << stream << " is dropped as out of limits";
     }
   }
 
@@ -288,7 +288,7 @@ void Streams::DiscardStreamData(const Stream &stream) {
     auto &&datas = stream_datas_map_[stream];
     datas.pop_back();
   } else {
-    LOG(WARNING) << "Stream data of " << stream << " is empty, could not discard";
+    VLOG(2) << "Stream data of " << stream << " is empty, could not discard";
   }
 }
 

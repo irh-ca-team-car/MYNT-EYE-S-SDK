@@ -51,11 +51,11 @@ int main(int /*argc*/, char *argv[]) {
 #endif
 
   if (VLOG_IS_ON(2)) {
-    LOG(WARNING) << "do some logging preparation and logging";
+    VLOG(2) << "do some logging preparation and logging";
   }
 
-  LOG(WARNING) << "verbose msg";
-  LOG(DEBUG) << "debug msg";
+  VLOG(2) << "verbose msg";
+  VLOG(1) << "debug msg";
   LOG(INFO) << "info msg";
   LOG(WARNING) << "warning msg";
   LOG(ERROR) << "error msg";
@@ -79,6 +79,6 @@ ANDROID_LOG_FATAL,    // LOG(FATAL)
 ANDROID_LOG_ERROR,    // LOG(ERROR)
 ANDROID_LOG_WARN,     // LOG(WARNING)
 ANDROID_LOG_INFO,     // LOG(INFO), LG, VLOG(0)
-ANDROID_LOG_DEBUG,    // LOG(DEBUG)
-ANDROID_LOG_VERBOSE,  // LOG(WARNING) .. VLOG(N)
+ANDROID_LOG_DEBUG,    // VLOG(1)
+ANDROID_LOG_VERBOSE,  // VLOG(2) .. VLOG(N)
 */

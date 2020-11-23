@@ -25,13 +25,13 @@ Standard2Device::Standard2Device(const Model &model,
   : Device(model, device,
            std::make_shared<Standard2StreamsAdapter>(model),
            std::make_shared<Standard2ChannelsAdapter>(model)) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
   CHECK(model == Model::STANDARD2 || model == Model::STANDARD210A ||
         model == Model::STANDARD200B);
 }
 
 Standard2Device::~Standard2Device() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 Capabilities Standard2Device::GetKeyStreamCapability() const {

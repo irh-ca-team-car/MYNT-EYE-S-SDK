@@ -81,7 +81,7 @@ bool unpack_stereo_img_data(
   //   << ", checksum=0x" << std::hex << static_cast<int>(img_packet.checksum);
 
   if (img_packet.header != 0x3B) {
-    LOG(WARNING) << "Image packet header must be 0x3B, but 0x" << std::hex
+    VLOG(2) << "Image packet header must be 0x3B, but 0x" << std::hex
             << std::uppercase << std::setw(2) << std::setfill('0')
             << static_cast<int>(img_packet.header) << " now";
     return false;
@@ -93,7 +93,7 @@ bool unpack_stereo_img_data(
   }
 
   if (img_packet.checksum != checksum) {
-    LOG(WARNING) << "Image packet checksum should be 0x" << std::hex
+    VLOG(2) << "Image packet checksum should be 0x" << std::hex
             << std::uppercase << std::setw(2) << std::setfill('0')
             << static_cast<int>(img_packet.checksum) << ", but 0x"
             << std::setw(2) << std::setfill('0') << static_cast<int>(checksum)
@@ -139,7 +139,6 @@ bool unpack_right_img_pixels(
 }  // namespace
 
 StandardStreamsAdapter::StandardStreamsAdapter() {
-  LOG(WARNING) << "StandardStreamAdapter";
 }
 
 StandardStreamsAdapter::~StandardStreamsAdapter() {

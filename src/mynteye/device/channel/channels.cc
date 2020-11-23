@@ -150,7 +150,7 @@ Channels::Channels(const std::shared_ptr<uvc::device> &device,
     timestamp_compensate_(0),
     is_nearly_before_timestamp_limmit_(0),
     current_datum_(0) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
   UpdateControlInfos();
   accel_range = GetControlValue(Option::ACCELEROMETER_RANGE);
   if (accel_range == -1)
@@ -162,7 +162,7 @@ Channels::Channels(const std::shared_ptr<uvc::device> &device,
 }
 
 Channels::~Channels() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
   StopImuTracking();
 }
 
@@ -205,7 +205,7 @@ void Channels::UpdateControlInfos() {
 
   if (VLOG_IS_ON(2)) {
     for (auto &&it = control_infos_.begin(); it != control_infos_.end(); it++) {
-      LOG(WARNING) << it->first << ": min=" << it->second.min
+      VLOG(2) << it->first << ": min=" << it->second.min
               << ", max=" << it->second.max << ", def=" << it->second.def
               << ", cur=" << GetControlValue(it->first);
     }
@@ -452,7 +452,7 @@ void Channels::DoImuTrack1() {
     return;
   }
 
-  LOG(WARNING) << "Imu req sn: " << imu_sn_ << ", res count: " << []() {
+  VLOG(2) << "Imu req sn: " << imu_sn_ << ", res count: " << []() {
     std::size_t n = 0;
     for (auto &&packet : res_packet.packets) {
       n += packet.count;
@@ -462,7 +462,7 @@ void Channels::DoImuTrack1() {
 
   auto &&sn = res_packet.packets.back().serial_number;
   if (imu_sn_ == sn) {
-    LOG(WARNING) << "New imu not ready, dropped";
+    VLOG(2) << "New imu not ready, dropped";
     return;
   }
   imu_sn_ = sn;
@@ -496,7 +496,7 @@ void Channels::DoImuTrack1WithTimeLimmitFix() {
     return;
   }
 
-  LOG(WARNING) << "Imu req sn: " << imu_sn_ << ", res count: " << []() {
+  VLOG(2) << "Imu req sn: " << imu_sn_ << ", res count: " << []() {
     std::size_t n = 0;
     for (auto &&packet : res_packet.packets) {
       n += packet.count;
@@ -506,7 +506,7 @@ void Channels::DoImuTrack1WithTimeLimmitFix() {
 
   auto &&sn = res_packet.packets.back().serial_number;
   if (imu_sn_ == sn) {
-    LOG(WARNING) << "New imu not ready, dropped";
+    VLOG(2) << "New imu not ready, dropped";
     return;
   }
   imu_sn_ = sn;
@@ -562,7 +562,7 @@ void Channels::DoImuTrack2() {
   if (res_packet.packets.back().count == 0) {
     return;
   }
-  LOG(WARNING) << "Imu req sn: " << imu_sn_ << ", res count: " << []() {
+  VLOG(2) << "Imu req sn: " << imu_sn_ << ", res count: " << []() {
     std::size_t n = 0;
     for (auto &&packet : res_packet.packets) {
       n += packet.count;
@@ -571,7 +571,7 @@ void Channels::DoImuTrack2() {
   }();
   auto &&sn = res_packet.packets.back().serial_number;
   if (imu_sn_ == sn) {
-    LOG(WARNING) << "New imu not ready, dropped";
+    VLOG(2) << "New imu not ready, dropped";
     return;
   }
   imu_sn_ = sn;
@@ -602,7 +602,7 @@ void Channels::StartImuTracking(imu_callback_t callback) {
       if (time_elapsed_ms < IMU_TRACK_PERIOD) {
         std::this_thread::sleep_for(
             std::chrono::milliseconds(IMU_TRACK_PERIOD - time_elapsed_ms));
-        LOG(WARNING) << "Imu track cost " << time_elapsed_ms << " ms"
+        VLOG(2) << "Imu track cost " << time_elapsed_ms << " ms"
                 << ", sleep " << (IMU_TRACK_PERIOD - time_elapsed_ms) << " ms";
       }
     };
@@ -659,7 +659,7 @@ bool Channels::GetFiles(
   header[2] = (imu_params != nullptr);
 
   data[0] = static_cast<std::uint8_t>(header.to_ulong());
-  LOG(WARNING) << "GetFiles header: 0x" << std::hex << std::uppercase << std::setw(2)
+  VLOG(2) << "GetFiles header: 0x" << std::hex << std::uppercase << std::setw(2)
           << std::setfill('0') << static_cast<int>(data[0]);
   if (!XuFileQuery(uvc::XU_QUERY_SET, 2000, data)) {
     LOG(WARNING) << "GetFiles failed";
@@ -670,7 +670,7 @@ bool Channels::GetFiles(
     // header = std::bitset<8>(data[0]);
     std::uint16_t size = bytes::_from_data<std::uint16_t>(data + 1);
     std::uint8_t checksum = data[3 + size];
-    LOG(WARNING) << "GetFiles data size: " << size << ", checksum: 0x" << std::hex
+    VLOG(2) << "GetFiles data size: " << size << ", checksum: 0x" << std::hex
             << std::setw(2) << std::setfill('0') << static_cast<int>(checksum);
 
     std::uint8_t checksum_now = 0;
@@ -691,7 +691,7 @@ bool Channels::GetFiles(
     while (i < end) {
       std::uint8_t file_id = *(data + i);
       std::uint16_t file_size = bytes::_from_data<std::uint16_t>(data + i + 1);
-      LOG(WARNING) << "GetFiles id: " << static_cast<int>(file_id)
+      VLOG(2) << "GetFiles id: " << static_cast<int>(file_id)
               << ", size: " << file_size;
       i += 3;
       switch (file_id) {
@@ -732,7 +732,7 @@ bool Channels::GetFiles(
       i += file_size;
     }
 
-    LOG(WARNING) << "GetFiles success";
+    VLOG(2) << "GetFiles success";
     return true;
   } else {
     LOG(WARNING) << "GetFiles failed";
@@ -803,10 +803,10 @@ bool Channels::SetFiles(
   data[1] = static_cast<std::uint8_t>((size >> 8) & 0xFF);
   data[2] = static_cast<std::uint8_t>(size & 0xFF);
 
-  LOG(WARNING) << "SetFiles header: 0x" << std::hex << std::uppercase << std::setw(2)
+  VLOG(2) << "SetFiles header: 0x" << std::hex << std::uppercase << std::setw(2)
           << std::setfill('0') << static_cast<int>(data[0]);
   if (XuFileQuery(uvc::XU_QUERY_SET, 2000, data)) {
-    LOG(WARNING) << "SetFiles success";
+    VLOG(2) << "SetFiles success";
     return true;
   } else {
     LOG(WARNING) << "SetFiles failed";
@@ -881,7 +881,7 @@ void Channels::XuCamCtrlSet(Option option, std::int32_t value) const {
                           static_cast<std::uint8_t>((value >> 8) & 0xFF),
                           static_cast<std::uint8_t>(value & 0xFF)};
   if (XuCamCtrlQuery(uvc::XU_QUERY_SET, 3, data)) {
-    LOG(WARNING) << "XuCamCtrlSet value (" << value << ") of " << option
+    VLOG(2) << "XuCamCtrlSet value (" << value << ") of " << option
             << " success";
   } else {
     LOG(WARNING) << "XuCamCtrlSet value (" << value << ") of " << option
@@ -894,7 +894,7 @@ bool Channels::XuHalfDuplexSet(Option option, xu_cmd_t cmd) const {
   std::uint8_t data[20] = {static_cast<std::uint8_t>(id & 0xFF),
                            static_cast<std::uint8_t>(cmd)};
   if (XuControlQuery(CHANNEL_HALF_DUPLEX, uvc::XU_QUERY_SET, 20, data)) {
-    LOG(WARNING) << "XuHalfDuplexSet value (0x" << std::hex << std::uppercase << cmd
+    VLOG(2) << "XuHalfDuplexSet value (0x" << std::hex << std::uppercase << cmd
             << ") of " << option << " success";
     return true;
   } else {
@@ -917,7 +917,7 @@ bool Channels::XuHalfDuplexSet(Option option, std::uint64_t value) const {
                            static_cast<std::uint8_t>((value >> 56) & 0xFF)};
 
   if (XuControlQuery(CHANNEL_HALF_DUPLEX, uvc::XU_QUERY_SET, 20, data)) {
-    LOG(WARNING) << "XuHalfDuplexSet value (0x" << std::hex << std::uppercase << value  // NOLINT
+    VLOG(2) << "XuHalfDuplexSet value (0x" << std::hex << std::uppercase << value  // NOLINT
             << ") of " << option << " success";
     return true;
   } else {
@@ -932,7 +932,7 @@ bool Channels::XuImuWrite(const ImuReqPacket &req) const {
   // LOG(INFO) << data.size() << "||" << (int)data[0] << " " <<  (int)data[1] << " " << (int)data[2] << " " << (int)data[3] << " " << (int)data[4];  // NOLINT
   if (XuControlQuery(
           CHANNEL_IMU_WRITE, uvc::XU_QUERY_SET, data.size(), data.data())) {
-    LOG(WARNING) << "XuImuWrite request success";
+    VLOG(2) << "XuImuWrite request success";
     return true;
   } else {
     LOG(WARNING) << "XuImuWrite request failed";
@@ -945,7 +945,7 @@ bool Channels::XuImuWrite(const ImuReqPacket2 &req) const {
   // LOG(INFO) << data.size() << "||" << (int)data[0] << " " <<  (int)data[1] << " " << (int)data[2] << " " << (int)data[3] << " " << (int)data[4];  // NOLINT
   if (XuControlQuery(
           CHANNEL_IMU_WRITE, uvc::XU_QUERY_SET, data.size(), data.data())) {
-    LOG(WARNING) << "XuImuWrite request success";
+    VLOG(2) << "XuImuWrite request success";
     return true;
   } else {
     LOG(WARNING) << "XuImuWrite request failed";
@@ -970,7 +970,7 @@ bool Channels::XuImuRead(ImuResPacket2 *res) const {
       return false;
     }
 
-    LOG(WARNING) << "XuImuRead response success";
+    VLOG(2) << "XuImuRead response success";
     return true;
   } else {
     LOG(WARNING) << "XuImuRead response failed";
@@ -1009,7 +1009,7 @@ bool Channels::XuImuRead(ImuResPacket *res) const {
       return false;
     }
 
-    LOG(WARNING) << "XuImuRead response success";
+    VLOG(2) << "XuImuRead response success";
     return true;
   } else {
     LOG(WARNING) << "XuImuRead response failed";
@@ -1045,7 +1045,6 @@ Channels::control_info_t Channels::XuControlInfo(Option option) const {
 
 ChannelsAdapter::ChannelsAdapter(const Model &model)
   : model_(model) {
-    LOG(WARNING) << __func__;
 }
 
 ChannelsAdapter::~ChannelsAdapter() {

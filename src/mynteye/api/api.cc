@@ -192,11 +192,11 @@ std::vector<std::string> get_plugin_paths() {
   for (auto &&plat : plats) {
     for (auto &&dir : dirs) {
       auto &&plat_dir = dir + MYNTEYE_OS_SEP "plugins" + MYNTEYE_OS_SEP + plat;
-      // LOG(WARNING) << "plat_dir: " << plat_dir;
+      // VLOG(2) << "plat_dir: " << plat_dir;
       if (!dir_exists(plat_dir))
         continue;
       for (auto &&name : names) {
-        // LOG(WARNING) << "  name: " << name;
+        // VLOG(2) << "  name: " << name;
         auto &&path = plat_dir + MYNTEYE_OS_SEP + name;
         if (!file_exists(path))
           continue;
@@ -216,13 +216,13 @@ API::API(std::shared_ptr<Device> device, CalibrationModel calib_model)
     : device_(device), correspondence_(nullptr),
       api_correspondence_enable_(false),
       dev_correspondence_enable_(false) {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
   // std::dynamic_pointer_cast<StandardDevice>(device_);
   synthetic_.reset(new Synthetic(this, calib_model));
 }
 
 API::~API() {
-  LOG(WARNING) << __func__;
+  VLOG(2) << __func__;
 }
 
 std::shared_ptr<API> API::Create(int argc, char *argv[]) {
@@ -407,7 +407,7 @@ bool API::HasMotionCallback() const {
 
 void API::Start(const Source &source) {
   if (source == Source::VIDEO_STREAMING) {
-#ifdef xdfWITH_FILESYSTEM
+#ifdef WITH_FILESYSTEM
     if (!synthetic_->HasPlugin()) {
       try {
         auto &&plugin_paths = get_plugin_paths();
@@ -421,11 +421,9 @@ void API::Start(const Source &source) {
 #endif
     synthetic_->StartVideoStreaming();
   } else if (source == Source::MOTION_TRACKING) {
-    LOG(ERROR)<<"MOTION DATA IS NOT AVAILABLE IN THIS VERSION :(";
-    //device_->StartMotionTracking();
+    device_->StartMotionTracking();
   } else if (source == Source::ALL) {
     Start(Source::VIDEO_STREAMING);
-    
     Start(Source::MOTION_TRACKING);
   } else {
     LOG(ERROR) << "Unsupported source :(";
