@@ -98,8 +98,8 @@ void Synthetic::NotifyImageParamsChanged() {
     proc->ReloadImageParams(intr_left_, intr_right_, extr_);
 #ifdef WITH_CAM_MODELS
   } else if (processor && calib_model_ == CalibrationModel::KANNALA_BRANDT) {
-    //auto proc = static_cast<RectifyProcessor*>(&(*processor));
-    //proc->ReloadImageParams(intr_left_, intr_right_, extr_);
+    auto proc = static_cast<RectifyProcessor*>(&(*processor));
+    proc->ReloadImageParams(intr_left_, intr_right_, extr_);
 #endif
   } else {
     LOG(ERROR) << "Unknow calib model type in device" << std::endl;
@@ -342,23 +342,23 @@ void Synthetic::InitProcessors() {
 #ifdef WITH_CAM_MODELS
   } else if (calib_model_ == CalibrationModel::KANNALA_BRANDT) {
     // KANNALA_BRANDT
-   // auto rectify_processor_imp =
-   //     std::make_shared<RectifyProcessor>(intr_left_, intr_right_, extr_,
-   //                                        RECTIFY_PROC_PERIOD);
-   // rectify_processor = rectify_processor_imp;
-   // points_processor = std::make_shared<PointsProcessor>(
-   //     rectify_processor_imp -> getCameraROSMsgInfoPair(),
-   //     POINTS_PROC_PERIOD);
-   // auto disparity_processor_imp =
-   //   std::make_shared<DisparityProcessor>(DisparityComputingMethod::BM,
-   //       rectify_processor_imp -> getCameraROSMsgInfoPair(),
-   //       DISPARITY_PROC_PERIOD);
-   // depth_processor = std::make_shared<DepthProcessor>(
-    //    rectify_processor_imp -> getCameraROSMsgInfoPair(),
-     //   disparity_processor_imp->GetMinDisparity(),
-     //   disparity_processor_imp->GetMaxDisparity(),
-     //   DEPTH_PROC_PERIOD);
-    //disparity_processor = disparity_processor_imp;
+    auto rectify_processor_imp =
+        std::make_shared<RectifyProcessor>(intr_left_, intr_right_, extr_,
+                                           RECTIFY_PROC_PERIOD);
+    rectify_processor = rectify_processor_imp;
+    points_processor = std::make_shared<PointsProcessor>(
+        rectify_processor_imp -> getCameraROSMsgInfoPair(),
+        POINTS_PROC_PERIOD);
+    auto disparity_processor_imp =
+      std::make_shared<DisparityProcessor>(DisparityComputingMethod::BM,
+          rectify_processor_imp -> getCameraROSMsgInfoPair(),
+          DISPARITY_PROC_PERIOD);
+    depth_processor = std::make_shared<DepthProcessor>(
+        rectify_processor_imp -> getCameraROSMsgInfoPair(),
+        disparity_processor_imp->GetMinDisparity(),
+        disparity_processor_imp->GetMaxDisparity(),
+        DEPTH_PROC_PERIOD);
+    disparity_processor = disparity_processor_imp;
 #endif
   } else {
     // UNKNOW
@@ -564,10 +564,10 @@ void Synthetic::SetDisparityComputingMethodType(
 bool Synthetic::SetRectifyAlpha(const double &alpha) {
   if (checkControlDateWithStream(Stream::LEFT_RECTIFIED)) {
 #ifdef WITH_CAM_MODELS
-   // auto processor = find_processor<RectifyProcessor>(processor_);
-   // if (processor)
-   //   processor->SetRectifyAlpha(alpha);
-   // return true;
+    auto processor = find_processor<RectifyProcessor>(processor_);
+    if (processor)
+      processor->SetRectifyAlpha(alpha);
+    return true;
 #endif
   }
   LOG(ERROR) << "ERROR: no suited processor for rectify.";
@@ -590,8 +590,8 @@ std::shared_ptr<struct CameraROSMsgInfoPair>
 #ifdef WITH_CAM_MODELS
   } else if (calib_model_ == CalibrationModel::KANNALA_BRANDT) {
     auto processor = getProcessorWithStream(Stream::LEFT_RECTIFIED);
-    //auto proc = static_cast<RectifyProcessor*>(&(*processor));
-    //return proc->getCameraROSMsgInfoPair();
+    auto proc = static_cast<RectifyProcessor*>(&(*processor));
+    return proc->getCameraROSMsgInfoPair();
 #endif
   }
   return nullptr;
