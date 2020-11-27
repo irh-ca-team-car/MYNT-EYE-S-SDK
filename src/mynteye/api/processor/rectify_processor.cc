@@ -71,6 +71,8 @@ void RectifyProcessor::stereoRectify(models::CameraPtr leftOdo,
     cv::Rodrigues(matR,om);
   else
     matR.convertTo(om,CV_64FC1);
+  printMat(matR);
+  printMat(om);
     //cv::convertTo(matR,om, 1,0);// it's already a rotation vector
   om.convertTo(om,CV_64FC1,-0.5);
 
