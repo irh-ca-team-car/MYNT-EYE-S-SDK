@@ -18,6 +18,7 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "mynteye/logger.h"
+#include "opencv2/calib3d/calib3d_c.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -38,38 +39,51 @@ cv::Mat RectifyProcessor::rectifyrad(const cv::Mat& R) {
 }
 
 void RectifyProcessor::stereoRectify(models::CameraPtr leftOdo,
-    models::CameraPtr rightOdo, const CvMat* K1, const CvMat* K2,
-    const CvMat* D1, const CvMat* D2, CvSize imageSize,
-    const CvMat* matR, const CvMat* matT,
-    CvMat* _R1, CvMat* _R2, CvMat* _P1, CvMat* _P2, double* T_mul_f,
-    double *cx1_min_cx2,
-    int flags, double alpha, CvSize newImgSize) {
+      models::CameraPtr rightOdo, const cv::Mat& K1, const cv::Mat& K2,
+      const cv::Mat& D1, const cv::Mat& D2, cv::Size imageSize,
+      const cv::Mat& matR, const cv::Mat& matT,
+      cv::Mat& _R1, cv::Mat& _R2, cv::Mat& _P1, cv::Mat& _P2, double& T_mul_f,
+      double &cx1_min_cx2,
+      int flags , double alpha ,
+      cv::Size newImgSize) {
   // std::cout << _alpha << std::endl;
   alpha = _alpha;
   double _om[3], _t[3] = {0}, _uu[3]={0, 0, 0}, _r_r[3][3], _pp[3][4];
   double _ww[3], _wr[3][3], _z[3] = {0, 0, 0}, _ri[3][3], _w3[3];
   cv::Rect_<float> inner1, inner2, outer1, outer2;
 
-  CvMat om  = cvMat(3, 1, CV_64F, _om);
-  CvMat t   = cvMat(3, 1, CV_64F, _t);
-  CvMat uu  = cvMat(3, 1, CV_64F, _uu);
-  CvMat r_r = cvMat(3, 3, CV_64F, _r_r);
-  CvMat pp  = cvMat(3, 4, CV_64F, _pp);
-  CvMat ww  = cvMat(3, 1, CV_64F, _ww);  // temps
-  CvMat w3  = cvMat(3, 1, CV_64F, _w3);  // temps
-  CvMat wR  = cvMat(3, 3, CV_64F, _wr);
-  CvMat Z   = cvMat(3, 1, CV_64F, _z);
-  CvMat Ri  = cvMat(3, 3, CV_64F, _ri);
+  cv::Mat om  = cv::Mat(3, 1, CV_64FC1, _om);
+  cv::Mat t   = cv::Mat(3, 1, CV_64FC1, _t);
+  cv::Mat uu  = cv::Mat(3, 1, CV_64FC1, _uu);
+  cv::Mat r_r = cv::Mat(3, 3, CV_64FC1, _r_r);
+  cv::Mat pp  = cv::Mat(3, 4, CV_64FC1, _pp);
+  cv::Mat ww  = cv::Mat(3, 1, CV_64FC1, _ww);  // temps
+  cv::Mat w3  = cv::Mat(3, 1, CV_64FC1, _w3);  // temps
+  cv::Mat wR  = cv::Mat(3, 3, CV_64FC1, _wr);
+  cv::Mat Z   = cv::Mat(3, 1, CV_64FC1, _z);
+  cv::Mat Ri  = cv::Mat(3, 3, CV_64FC1, _ri);
   double nx = imageSize.width, ny = imageSize.height;
   int i, k;
   double nt, nw;
-  if ( matR->rows == 3 && matR->cols == 3)
-      cvRodrigues2(matR, &om);          // get vector rotation
+  #define printMat(A) std::cout << #A"   TYPE="<<CV_MAT_DEPTH(A.type())<<" ROWS="<<A.rows<<" COLS="<<A.cols<<std::endl;
+
+  if ( matR.rows == 3 && matR.cols == 3)
+    cv::Rodrigues(matR,om);
   else
-      cvConvert(matR, &om);  // it's already a rotation vector
-  cvConvertScale(&om, &om, -0.5);  // get average rotation
-  cvRodrigues2(&om, &r_r);  // rotate cameras to same orientation by averaging
-  cvMatMul(&r_r, matT, &t);
+    matR.convertTo(om,CV_64FC1);
+    //cv::convertTo(matR,om, 1,0);// it's already a rotation vector
+  om.convertTo(om,CV_64FC1,-0.5);
+
+  //cv::convertScaleAbs(om, om, -0.5);  // get average rotation
+  cv::Rodrigues(om,r_r);// rotate cameras to same orientation by averaging
+  std::cerr << "multiply"<<std::endl;
+  printMat(r_r);
+  printMat(matT);
+  printMat(t);
+  //cv::multiply(r_r,matT,t);
+  //cvMatMul(&r_r, matT, &t)
+  //cvMatMulAdd(&r_r, matT,NULL, &t);
+  cv::gemm(r_r,matT,1,NULL,1,t,0);
   int idx = fabs(_t[0]) > fabs(_t[1]) ? 0 : 1;
 
   // if idx == 0
@@ -83,13 +97,15 @@ void RectifyProcessor::stereoRectify(models::CameraPtr leftOdo,
   // e3 = e1 x e2
 
   _uu[2] = 1;
-  cvCrossProduct(&uu, &t, &ww);
-  nt = cvNorm(&t, 0, CV_L2);
-  nw = cvNorm(&ww, 0, CV_L2);
-  cvConvertScale(&ww, &ww, 1 / nw);
-  cvCrossProduct(&t, &ww, &w3);
-  nw = cvNorm(&w3, 0, CV_L2);
-  cvConvertScale(&w3, &w3, 1 / nw);
+  std::cerr << "crossproduct"<<std::endl;
+  #define cvCrossProduct(A,B,C) C= A.cross(B)
+  cvCrossProduct(uu, t, ww);
+  nt = cv::norm(t, cv::NORM_L2);
+  nw = cv::norm(ww, cv::NORM_L2);
+  ww.convertTo(ww, 1 / nw);
+  cvCrossProduct(t, ww, w3);
+  nw = cv::norm(w3, cv::NORM_L2);
+  w3.convertTo(w3, 1 / nw);
   _uu[2] = 0;
 
   for (i = 0; i < 3; ++i) {
@@ -99,16 +115,19 @@ void RectifyProcessor::stereoRectify(models::CameraPtr leftOdo,
   }
 
   // apply to both views
-  cvGEMM(&wR, &r_r, 1, 0, 0, &Ri, CV_GEMM_B_T);
-  cvConvert(&Ri, _R1);
-  cvGEMM(&wR, &r_r, 1, 0, 0, &Ri, 0);
-  cvConvert(&Ri, _R2);
-  cvMatMul(&Ri, matT, &t);
+  cv::gemm(wR,r_r,1,cv::Mat(),0,Ri,cv::GEMM_2_T);
+  //cvGEMM(&wR, &r_r, 1, 0, 0, &Ri, CV_GEMM_B_T);
+  Ri.convertTo(_R1,1,0);
+  cv::gemm(wR,r_r,1,cv::Mat(),0,Ri);
+  //cvGEMM(&wR, &r_r, 1, 0, 0, &Ri, 0);
+  Ri.convertTo(_R2,1,0);
+  cv::multiply(Ri,matT,t);
+  //cv::MatMul(&Ri, matT, &t);
 
   // calculate projection/camera matrices
   // these contain the relevant rectified image internal params (fx, fy=fx, cx, cy)
   double fc_new = DBL_MAX;
-  CvPoint2D64f cc_new[2] = {{0, 0}, {0, 0}};
+  cv::Point2d cc_new[2] = {{0, 0}, {0, 0}};
   newImgSize = newImgSize.width * newImgSize.height != 0 ?
       newImgSize : imageSize;
   const double ratio_x = static_cast<double>(newImgSize.width) /
@@ -116,14 +135,14 @@ void RectifyProcessor::stereoRectify(models::CameraPtr leftOdo,
   const double ratio_y = static_cast<double>(newImgSize.height) /
       imageSize.height / 2;
   const double ratio = idx == 1 ? ratio_x : ratio_y;
-  fc_new = (cvmGet(K1, idx ^ 1, idx ^ 1) +
-      cvmGet(K2, idx ^ 1, idx ^ 1)) * ratio;
+  fc_new = K1.at<double>(idx ^ 1, idx ^ 1) +
+      K2.at<double>(idx ^ 1, idx ^ 1) * ratio;
 
   for (k = 0; k < 2; k++) {
-    CvPoint2D32f _pts[4];
-    CvPoint3D32f _pts_3[4];
-    CvMat pts = cvMat(1, 4, CV_32FC2, _pts);
-    CvMat pts_3 = cvMat(1, 4, CV_32FC3, _pts_3);
+    cv::Point2f _pts[4];
+    cv::Point2f _pts_3[4];
+    cv::Mat pts = cv::Mat(1, 4, CV_32FC2, _pts);
+    cv::Mat pts_3 = cv::Mat(1, 4, CV_32FC3, _pts_3);
     // Eigen::Vector2d a;
     // Eigen::Vector3d b;
     models::Vector2d a(2, 1);
@@ -140,17 +159,19 @@ void RectifyProcessor::stereoRectify(models::CameraPtr leftOdo,
       _pts[i].x = b(0)/b(2);
       _pts[i].y = b(1)/b(2);
     }
-    cvConvertPointsHomogeneous(&pts, &pts_3);
+    cv::convertPointsHomogeneous(pts,pts_3);
+    //cvConvertPointsHomogeneous(&pts, &pts_3);
 
     // Change camera matrix to have cc=[0,0] and fc = fc_new
     double _a_tmp[3][3];
-    CvMat A_tmp  = cvMat(3, 3, CV_64F, _a_tmp);
+    cv::Mat A_tmp  = cv::Mat(3, 3, CV_64F, _a_tmp);
     _a_tmp[0][0] = fc_new;
     _a_tmp[1][1] = fc_new;
     _a_tmp[0][2] = 0.0;
     _a_tmp[1][2] = 0.0;
-    cvProjectPoints2(&pts_3, k == 0 ? _R1 : _R2, &Z, &A_tmp, 0, &pts);
-    CvScalar avg = cvAvg(&pts);
+    cv::projectPoints(pts_3, k == 0 ? _R1 : _R2, Z, A_tmp, 0, pts);
+    //cvProjectPoints2(&pts_3, k == 0 ? _R1 : _R2, &Z, &A_tmp, 0, &pts);
+    cv::Scalar avg =  cv::mean(pts);
     cc_new[k].x = (nx)/2 - avg.val[0];
     cc_new[k].y = (ny)/2 - avg.val[1];
   }
@@ -165,19 +186,19 @@ void RectifyProcessor::stereoRectify(models::CameraPtr leftOdo,
     // vertical stereo
     cc_new[0].x = cc_new[1].x = (cc_new[0].x + cc_new[1].x)*0.5;
   }
+  pp.setTo(cv::Scalar::all(0));
 
-  cvZero(&pp);
   _pp[0][0] = _pp[1][1] = fc_new;
   _pp[0][2] = cc_new[0].x;
   _pp[1][2] = cc_new[0].y;
   _pp[2][2] = 1;
-  cvConvert(&pp, _P1);
+  cv::convertScaleAbs(pp, _P1);
 
   _pp[0][2] = cc_new[1].x;
   _pp[1][2] = cc_new[1].y;
   _pp[idx][3] = _t[idx]*fc_new;  // baseline * focal length
-  *T_mul_f = 0. - _t[idx] * fc_new;
-  cvConvert(&pp, _P2);
+  T_mul_f = 0. - _t[idx] * fc_new;
+  cv::convertScaleAbs(pp, _P2);
 
   _alpha = MIN(alpha, 1.);
   {
@@ -213,21 +234,22 @@ void RectifyProcessor::stereoRectify(models::CameraPtr leftOdo,
     }
 
     fc_new *= s;
-    cc_new[0] = cvPoint2D64f(cx1, cy1);
-    cc_new[1] = cvPoint2D64f(cx2, cy2);
-
+    cc_new[0] = cv::Point2d(cx1, cy1);
+    cc_new[1] = cv::Point2d(cx2, cy2);
+    #define cvmSet(A,B,C,D) A.at<double>(B,C)= D
     cvmSet(_P1, 0, 0, fc_new);
     cvmSet(_P1, 1, 1, fc_new);
     cvmSet(_P1, 0, 2, cx1);
     cvmSet(_P1, 1, 2, cy1);
 
-    cvmSet(_P2, 0, 0, fc_new);
-    cvmSet(_P2, 1, 1, fc_new);
-    cvmSet(_P2, 0, 2, cx2);
-    cvmSet(_P2, 1, 2, cy2);
-    cvmSet(_P2, idx, 3, s*cvmGet(_P2, idx, 3));
+    _P2.at<double>(0, 0) = (fc_new);
+    _P2.at<double>(1, 1) = (fc_new);
+    _P2.at<double>(0, 2) = (cx2);
+    _P2.at<double>(1, 2) = (cy2);
+    _P2.at<double>(idx, 3, s*_P2.at<double>( idx, 3));
+    _P2.at<double>(idx, 3) = s*_P2.at<double>( idx, 3);
 
-    *cx1_min_cx2 = -(cx1 - cx2);
+    cx1_min_cx2 = -(cx1 - cx2);
     // std::cout << "info_pair.T_mul_f :" << *T_mul_f << std::endl;
     // std::cout << "info_pair.cx1_minus_cx2 :" << *cx1_min_cx2 << std::endl;
   }
@@ -326,14 +348,14 @@ std::shared_ptr<struct CameraROSMsgInfoPair> RectifyProcessor::stereoRectify(
   cv::Mat P1 = cv::Mat(3, 4, CV_64F);
   cv::Mat P2 = cv::Mat(3, 4, CV_64F);
 
-  CvMat c_R = cv_R, c_t = cv_t;
-  CvMat c_K1 = K1, c_K2 = K2, c_D1 = D1, c_D2 = D2;
-  CvMat c_R1 = R1, c_R2 = R2, c_P1 = P1, c_P2 = P2;
+  cv::Mat c_R = cv_R, c_t = cv_t;
+  cv::Mat c_K1 = K1, c_K2 = K2, c_D1 = D1, c_D2 = D2;
+  cv::Mat c_R1 = R1, c_R2 = R2, c_P1 = P1, c_P2 = P2;
   double T_mul_f;
   double cx1_min_cx2;
-  stereoRectify(leftOdo, rightOdo, &c_K1, &c_K2, &c_D1, &c_D2,
-      image_size1, &c_R, &c_t, &c_R1, &c_R2, &c_P1, &c_P2, &T_mul_f,
-      &cx1_min_cx2);
+  stereoRectify(leftOdo, rightOdo, c_K1, c_K2, c_D1, c_D2,
+      image_size1, c_R, c_t, c_R1, c_R2, c_P1, c_P2, T_mul_f,
+      cx1_min_cx2);
 
 #ifdef _DOUTPUT
   std::cout << "K1: " << K1 << std::endl;

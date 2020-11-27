@@ -102,11 +102,11 @@ struct buffer {
 
 struct context {
   context() {
-    VLOG(2) << __func__;
+    //VLOG(2) << __func__;
   }
 
   ~context() {
-    VLOG(2) << __func__;
+    //VLOG(2) << __func__;
   }
 };
 

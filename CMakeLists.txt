@@ -47,7 +47,7 @@ string(STRIP "${CMAKE_C_FLAGS}" CMAKE_C_FLAGS)
 string(STRIP "${CMAKE_CXX_FLAGS}" CMAKE_CXX_FLAGS)
 message(STATUS "C_FLAGS: ${CMAKE_C_FLAGS}")
 message(STATUS "CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-
+add_compile_options(-Wfatal-errors)
 # packages
 
 find_package(Threads QUIET)

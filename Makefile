@@ -48,7 +48,7 @@ help:
 
 .PHONY: help
 
-all: init samples ros
+all: init build
 
 .PHONY: all
 
@@ -108,19 +108,17 @@ else
 endif
 endif
 
-.PHONY: install
-
 uninstall:
 	@$(call echo,Make $@)
 ifeq ($(HOST_OS),Linux)
-#	$(SUDO) rm -rf /usr/include/mynteye/
-#	$(SUDO) rm -rf /usr/lib/libmynteye.so*
-#	$(SUDO) rm -rf /usr/lib/cmake/mynteye/
-#	$(SUDO) rm -rf /usr/share/mynteye/
-#	$(SUDO) rm -rf /usr/local/include/mynteye/
-#	$(SUDO) rm -rf /usr/local/lib/libmynteye.so*
-#	$(SUDO) rm -rf /usr/local/lib/cmake/mynteye/
-#	$(SUDO) rm -rf /usr/local/share/mynteye/
+	$(SUDO) rm -rf /usr/include/mynteye/
+	$(SUDO) rm -rf /usr/lib/libmynteye.so*
+	$(SUDO) rm -rf /usr/lib/cmake/mynteye/
+	$(SUDO) rm -rf /usr/share/mynteye/
+	$(SUDO) rm -rf /usr/local/include/mynteye/
+	$(SUDO) rm -rf /usr/local/lib/libmynteye.so*
+	$(SUDO) rm -rf /usr/local/lib/cmake/mynteye/
+	$(SUDO) rm -rf /usr/local/share/mynteye/
 endif
 
 # samples
@@ -128,8 +126,6 @@ endif
 samples: install
 	@$(call echo,Make $@)
 	@$(call cmake_build,./samples/_build)
-
-.PHONY: samples
 
 # pkg
 
@@ -156,8 +152,6 @@ ifeq ($(HOST_OS),Linux)
 else
 	$(error "Can't make ros on $(HOST_OS)")
 endif
-
-.PHONY: ros
 
 cleanros:
 	@$(call echo,Make $@)

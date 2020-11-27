@@ -76,11 +76,32 @@ struct glog_init {
 
 #include "mynteye/mynteye.h"
 
-#define MYNTEYE_MAX_LOG_LEVEL google::INFO
+//#define MYNTEYE_MAX_LOG_LEVEL google::INFO
 // #define MYNTEYE_MAX_LOG_LEVEL 2
 
-#include "mynteye/miniglog.h"
+//#include "mynteye/miniglog.h"
+
+#endif  // MYNTEYE_LOGGER_H_
+#include <sstream>
+class NullBuffer {
+    std::stringstream ss;
+      public:
+   template <typename T> std::ostream& operator<<(const T &arg) {
+        return ss << arg;
+    }
+};
+
+#define LOG(A) (NullBuffer())
+#define VLOG(A) (NullBuffer())
+#define LOG_IF(A,...) (NullBuffer())
+#define VLOG_IS_ON(A) false
+#define CHECK_NOTNULL(A) /*A*/
+#define CHECK_EQ(A,B) (NullBuffer())
+#define CHECK_GE(A,B) (NullBuffer())
+#define CHECK_GT(A,B) (NullBuffer())
+#define CHECK_LT(A,B) (NullBuffer())
+#define CHECK_LE(A,B) (NullBuffer())
+#define CHECK(A) (NullBuffer())
 
 #endif
 
-#endif  // MYNTEYE_LOGGER_H_
