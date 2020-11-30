@@ -30,14 +30,19 @@ DisparityProcessor::DisparityProcessor(DisparityComputingMethod type,
     std::shared_ptr<struct CameraROSMsgInfoPair> calib_infos,
     std::int32_t proc_period)
     : Processor(std::move(proc_period)), type_(type) {
+  TRACE;
   if (calib_infos) {
     cx1_minus_cx2_ = calib_infos->cx1_minus_cx2;
   } else {
     cx1_minus_cx2_ = 1.f;
   }
+  TRACE;
+
   VLOG(2) << __func__ << ": proc_period=" << proc_period;
   int sgbmWinSize = 3;
   int numberOfDisparities = 128;
+  TRACE;
+
 #ifdef WITH_OPENCV2
     // StereoSGBM
     //   http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html?#stereosgbm
@@ -69,10 +74,19 @@ DisparityProcessor::DisparityProcessor(DisparityComputingMethod type,
     //     15,
     //     100,
     //     4));
+  TRACE;
+
 #else
-    sgbm_matcher = cv::StereoSGBM::create(0, 16, 3);
+  TRACE;
+
+    sgbm_matcher = cv::StereoSGBM::create(0, 16, 3,0,0,0,0,0,0,0,cv::StereoSGBM::MODE_SGBM);
+  TRACE;
     sgbm_matcher->setPreFilterCap(63);
+  TRACE;
+
     sgbm_matcher->setBlockSize(sgbmWinSize);
+  TRACE;
+
     sgbm_matcher->setP1(8 * sgbmWinSize * sgbmWinSize);
     sgbm_matcher->setP2(32 * sgbmWinSize * sgbmWinSize);
     sgbm_matcher->setMinDisparity(0);
@@ -81,11 +95,17 @@ DisparityProcessor::DisparityProcessor(DisparityComputingMethod type,
     sgbm_matcher->setSpeckleWindowSize(100);
     sgbm_matcher->setSpeckleRange(32);
     sgbm_matcher->setDisp12MaxDiff(1);
+  TRACE;
+
     disparity_min_sgbm_ptr =
       std::make_shared<int>(sgbm_matcher->getMinDisparity());
     disparity_max_sgbm_ptr =
       std::make_shared<int>(sgbm_matcher->getNumDisparities());
+  TRACE;
+
     bm_matcher = cv::StereoBM::create(0, 3);
+  TRACE;
+
     bm_matcher->setPreFilterSize(9);
     bm_matcher->setPreFilterCap(31);
     bm_matcher->setBlockSize(15);
@@ -100,7 +120,11 @@ DisparityProcessor::DisparityProcessor(DisparityComputingMethod type,
       std::make_shared<int>(bm_matcher->getMinDisparity());
     disparity_max_bm_ptr =
       std::make_shared<int>(bm_matcher->getNumDisparities());
+  TRACE;
+
 #endif
+  TRACE;
+
   NotifyComputingTypeChanged(type_);
 }
 

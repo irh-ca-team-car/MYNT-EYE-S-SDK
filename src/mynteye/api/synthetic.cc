@@ -98,7 +98,7 @@ void Synthetic::NotifyImageParamsChanged() {
     proc->ReloadImageParams(intr_left_, intr_right_, extr_);
 #ifdef WITH_CAM_MODELS
   } else if (processor && calib_model_ == CalibrationModel::KANNALA_BRANDT) {
-    auto proc = static_cast<RectifyProcessor*>(&(*processor));
+    auto proc = static_cast<RectifyProcessor4*>(&(*processor));
     proc->ReloadImageParams(intr_left_, intr_right_, extr_);
 #endif
   } else {
@@ -342,17 +342,22 @@ void Synthetic::InitProcessors() {
 #ifdef WITH_CAM_MODELS
   } else if (calib_model_ == CalibrationModel::KANNALA_BRANDT) {
     // KANNALA_BRANDT
+    TRACE;
     auto rectify_processor_imp =
-        std::make_shared<RectifyProcessor>(intr_left_, intr_right_, extr_,
+        std::make_shared<RectifyProcessor4>(intr_left_, intr_right_, extr_,
                                            RECTIFY_PROC_PERIOD);
+    TRACE;
     rectify_processor = rectify_processor_imp;
+    TRACE;
     points_processor = std::make_shared<PointsProcessor>(
         rectify_processor_imp -> getCameraROSMsgInfoPair(),
         POINTS_PROC_PERIOD);
+    TRACE;
     auto disparity_processor_imp =
       std::make_shared<DisparityProcessor>(DisparityComputingMethod::BM,
           rectify_processor_imp -> getCameraROSMsgInfoPair(),
           DISPARITY_PROC_PERIOD);
+    TRACE;
     depth_processor = std::make_shared<DepthProcessor>(
         rectify_processor_imp -> getCameraROSMsgInfoPair(),
         disparity_processor_imp->GetMinDisparity(),
@@ -564,7 +569,7 @@ void Synthetic::SetDisparityComputingMethodType(
 bool Synthetic::SetRectifyAlpha(const double &alpha) {
   if (checkControlDateWithStream(Stream::LEFT_RECTIFIED)) {
 #ifdef WITH_CAM_MODELS
-    auto processor = find_processor<RectifyProcessor>(processor_);
+    auto processor = find_processor<RectifyProcessor4>(processor_);
     if (processor)
       processor->SetRectifyAlpha(alpha);
     return true;
@@ -590,7 +595,7 @@ std::shared_ptr<struct CameraROSMsgInfoPair>
 #ifdef WITH_CAM_MODELS
   } else if (calib_model_ == CalibrationModel::KANNALA_BRANDT) {
     auto processor = getProcessorWithStream(Stream::LEFT_RECTIFIED);
-    auto proc = static_cast<RectifyProcessor*>(&(*processor));
+    auto proc = static_cast<RectifyProcessor4*>(&(*processor));
     return proc->getCameraROSMsgInfoPair();
 #endif
   }

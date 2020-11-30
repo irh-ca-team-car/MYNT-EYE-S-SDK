@@ -33,16 +33,16 @@ MYNTEYE_BEGIN_NAMESPACE
 
 class Device;
 
-class RectifyProcessor : public Processor {
+class RectifyProcessor4 : public Processor {
  public:
   static const char NAME[];
 
-  RectifyProcessor(
+  RectifyProcessor4(
       std::shared_ptr<IntrinsicsBase> intr_left,
       std::shared_ptr<IntrinsicsBase> intr_right,
       std::shared_ptr<Extrinsics> extr,
       std::int32_t proc_period = 0);
-  virtual ~RectifyProcessor();
+  virtual ~RectifyProcessor4();
 
   std::string Name() override;
 

@@ -84,24 +84,85 @@ struct glog_init {
 #endif  // MYNTEYE_LOGGER_H_
 #include <sstream>
 class NullBuffer {
-    std::stringstream ss;
-      public:
-   template <typename T> std::ostream& operator<<(const T &arg) {
-        return ss << arg;
-    }
+  std::stringstream ss;
+
+ public:
+  template <typename T>
+  std::ostream &operator<<(const T &arg) {
+    return ss << arg;
+  }
 };
 
 #define LOG(A) (NullBuffer())
 #define VLOG(A) (NullBuffer())
-#define LOG_IF(A,...) (NullBuffer())
+#define LOG_IF(A, ...) (NullBuffer())
 #define VLOG_IS_ON(A) false
 #define CHECK_NOTNULL(A) /*A*/
-#define CHECK_EQ(A,B) (NullBuffer())
-#define CHECK_GE(A,B) (NullBuffer())
-#define CHECK_GT(A,B) (NullBuffer())
-#define CHECK_LT(A,B) (NullBuffer())
-#define CHECK_LE(A,B) (NullBuffer())
+#define CHECK_EQ(A, B) (NullBuffer())
+#define CHECK_GE(A, B) (NullBuffer())
+#define CHECK_GT(A, B) (NullBuffer())
+#define CHECK_LT(A, B) (NullBuffer())
+#define CHECK_LE(A, B) (NullBuffer())
 #define CHECK(A) (NullBuffer())
 
-#endif
+#define TRACE  //\
+  std::cout << __FILE__ << ":" << __LINE__ << "@" << __func__ << std::endl;
+#define PRINTMAT(M) LOGGER::Write::PrintMat(#M, M)
+#include <iostream>
+#include <opencv2/core/core.hpp>
+#define printContentD(M)                                             \
+  for (int c = 0; c < M.cols; c++)                                   \
+    for (int r = 0; r < M.rows; r++)                                 \
+      std::cout << "(" << c << ";" << r << ")" << M.at<double>(c, r) \
+                << std::endl;
+#define printContentF(M)                                            \
+  for (int c = 0; c < M.cols; c++)                                  \
+    for (int r = 0; r < M.rows; r++)                                \
+      std::cout << "(" << c << ";" << r << ")" << M.at<float>(c, r) \
+                << std::endl;
+#define printContentPtF(M)                                                \
+  for (int c = 0; c < M.cols; c++)                                        \
+    for (int r = 0; r < M.rows; r++)                                      \
+      std::cout << "(" << c << ";" << r << ")" << M.at<cv::Point2f>(M.rows * c  + r) \
+                << std::endl;
+#define printContentPt3F(M)                                               \
+  for (int c = 0; c < M.cols; c++)                                        \
+    for (int r = 0; r < M.rows; r++)                                      \
+      std::cout << "(" << c << ";" << r << ")" << M.at<cv::Point3f>(M.rows * c  + r) \
+                << std::endl;
+#define printContentPtD(M)                                                \
+  for (int c = 0; c < M.cols; c++)                                        \
+    for (int r = 0; r < M.rows; r++)                                      \
+      std::cout << "(" << c << ";" << r << ")" << M.at<cv::Point2d>(M.rows * c  + r) \
+                << std::endl;
+#define printContentPt3D(M)                                               \
+  for (int c = 0; c < M.cols; c++)                                        \
+    for (int r = 0; r < M.rows; r++)                                      \
+      std::cout << "(" << c << ";" << r << ")" << M.at<cv::Point3d>(M.rows * c  + r) \
+                << std::endl;
 
+namespace LOGGER {
+class Write {
+ public:
+  static void PrintMat(std::string name, cv::Mat A) {
+    std::cout << name << "  TYPE=" << CV_MAT_TYPE(A.type())
+              << " ROWS=" << A.rows << " COLS=" << A.cols
+              << " CHANNEL=" << A.channels() << std::endl;
+    if (A.type() == CV_64FC1)
+      for (int i = 0; i < A.cols * A.rows; i++)
+        std::cout << "(" << i << ")" << A.at<double>(i) << std::endl;
+    if (A.type() == CV_64FC2)
+      printContentPtD(A);
+    if (A.type() == CV_64FC3)
+      printContentPt3D(A);
+    if (A.type() == CV_32FC1)
+      for (int i = 0; i < A.cols * A.rows; i++)
+        std::cout << "(" << i << ")" << A.at<float>(i) << std::endl;
+    if (A.type() == CV_32FC2)
+      printContentPtF(A);
+    if (A.type() == CV_32FC3)
+      printContentPt3F(A);
+  }
+};
+}  // namespace LOGGER
+#endif
