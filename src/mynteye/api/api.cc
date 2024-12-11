@@ -226,11 +226,15 @@ API::~API() {
 }
 
 std::shared_ptr<API> API::Create(int argc, char *argv[]) {
+  LOG(ERROR) << "Finding device";
   auto &&device = device::select();
   if (!device) return nullptr;
+  LOG(ERROR) << "Create";
   auto api = Create(argc, argv, device);
+  LOG(ERROR) << "checkFirmwareVersion";
   if (api && checkFirmwareVersion(api))
     return api;
+  LOG(ERROR) << "checkFirmwareVersion failed";
   return nullptr;
 }
 
@@ -244,6 +248,7 @@ std::shared_ptr<API> API::Create(const std::shared_ptr<Device> &device) {
   std::shared_ptr<API> api = nullptr;
   if (device != nullptr) {
     bool in_l_ok, in_r_ok;
+  LOG(ERROR) << "GetIntrinsics";
     auto left_intr  = device->GetIntrinsics(Stream::LEFT, &in_l_ok);
     auto right_intr = device->GetIntrinsics(Stream::RIGHT, &in_r_ok);
 

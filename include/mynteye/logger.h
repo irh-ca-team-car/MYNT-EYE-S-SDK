@@ -83,6 +83,7 @@ struct glog_init {
 
 #endif  // MYNTEYE_LOGGER_H_
 #include <sstream>
+#include <iostream>
 class NullBuffer {
   std::stringstream ss;
 
@@ -90,6 +91,10 @@ class NullBuffer {
   template <typename T>
   std::ostream &operator<<(const T &arg) {
     return ss << arg;
+  }
+
+  ~NullBuffer(){
+    //std::cout << ss.str() << std::endl;
   }
 };
 

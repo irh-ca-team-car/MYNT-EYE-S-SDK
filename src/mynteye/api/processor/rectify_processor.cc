@@ -487,31 +487,31 @@ void RectifyProcessor4::InitParams(
   models::CameraPtr camera_odo_ptr_right =
       generateCameraFromIntrinsicsEquidistant(in_right);
   TRACE;
-  auto calib_info_tmp = stereoRectify(
-      camera_odo_ptr_left, camera_odo_ptr_right, in_left, in_right,
-      ex_right_to_left);
-  TRACE;
-  *calib_infos = *calib_info_tmp;
-  cv::Mat rect_R_l = cv::Mat::eye(3, 3, CV_32F),
-          rect_R_r = cv::Mat::eye(3, 3, CV_32F);
-  for (size_t i = 0; i < 3; i++) {
-    for (size_t j = 0; j < 3; j++) {
-      rect_R_l.at<float>(i, j) = calib_infos->left.R[i * 3 + j];
-      rect_R_r.at<float>(i, j) = calib_infos->right.R[i * 3 + j];
-    }
-  }
-  TRACE;
-  double left_f[] = {calib_infos->left.P[0], calib_infos->left.P[5]};
-  double left_center[] = {calib_infos->left.P[2], calib_infos->left.P[6]};
-  double right_f[] = {calib_infos->right.P[0], calib_infos->right.P[5]};
-  double right_center[] = {calib_infos->right.P[2], calib_infos->right.P[6]};
-  TRACE;
-  camera_odo_ptr_left->initUndistortRectifyMap(
-      map11, map12, left_f[0], left_f[1], cv::Size(0, 0), left_center[0],
-      left_center[1], rect_R_l);
-  camera_odo_ptr_right->initUndistortRectifyMap(
-      map21, map22, right_f[0], right_f[1], cv::Size(0, 0), right_center[0],
-      right_center[1], rect_R_r);
+//   auto calib_info_tmp = stereoRectify(
+//       camera_odo_ptr_left, camera_odo_ptr_right, in_left, in_right,
+//       ex_right_to_left);
+//   TRACE;
+//   *calib_infos = *calib_info_tmp;
+//   cv::Mat rect_R_l = cv::Mat::eye(3, 3, CV_32F),
+//           rect_R_r = cv::Mat::eye(3, 3, CV_32F);
+//   for (size_t i = 0; i < 3; i++) {
+//     for (size_t j = 0; j < 3; j++) {
+//       rect_R_l.at<float>(i, j) = calib_infos->left.R[i * 3 + j];
+//       rect_R_r.at<float>(i, j) = calib_infos->right.R[i * 3 + j];
+//     }
+//   }
+//   TRACE;
+//   double left_f[] = {calib_infos->left.P[0], calib_infos->left.P[5]};
+//   double left_center[] = {calib_infos->left.P[2], calib_infos->left.P[6]};
+//   double right_f[] = {calib_infos->right.P[0], calib_infos->right.P[5]};
+//   double right_center[] = {calib_infos->right.P[2], calib_infos->right.P[6]};
+//   TRACE;
+//   camera_odo_ptr_left->initUndistortRectifyMap(
+//       map11, map12, left_f[0], left_f[1], cv::Size(0, 0), left_center[0],
+//       left_center[1], rect_R_l);
+//   camera_odo_ptr_right->initUndistortRectifyMap(
+//       map21, map22, right_f[0], right_f[1], cv::Size(0, 0), right_center[0],
+//       right_center[1], rect_R_r);
   TRACE;
 }
 
